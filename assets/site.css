@@ -332,9 +332,32 @@ pre.highlight[data-lang]:not([data-lang=""])::before {
 /* graph */
 .graph-page { max-width: none; }
 #graph { width: 100%; height: 72vh; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-alt); }
+#graph svg { cursor: grab; }
+#graph svg:active { cursor: grabbing; }
 #graph circle { cursor: pointer; }
-#graph text { font-size: 10px; fill: var(--muted); pointer-events: none; }
+#graph text { font-size: 10px; fill: var(--muted); pointer-events: none; transition: opacity .15s; }
 #graph line { stroke: var(--border); }
+#graph .graph-node, #graph line { transition: opacity .15s; }
+#graph .dim { opacity: .12; }
+#graph .hidden { display: none; }
+#graph svg.zoomed-out text { opacity: 0; }
+#graph svg.hovering .graph-node:not(.dim) text { opacity: 1; }
+
+/* Graph toolbar: filter box, orphan toggle, folder legend */
+.graph-toolbar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-bottom: .75rem; }
+#graph-search {
+  background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: .35rem .6rem; color: var(--text); font-size: .9rem; width: 12rem;
+}
+.graph-toggle { display: flex; gap: .35rem; align-items: center; font-size: .85rem; color: var(--muted); cursor: pointer; }
+.graph-legend { display: flex; flex-wrap: wrap; gap: .4rem; }
+.legend-item {
+  display: flex; align-items: center; gap: .4rem; cursor: pointer;
+  background: var(--bg-alt); border: 1px solid var(--border); border-radius: 999px;
+  padding: .2rem .7rem; color: var(--text); font-size: .8rem;
+}
+.legend-item.off { opacity: .35; }
+.legend-swatch { width: .65rem; height: .65rem; border-radius: 50%; display: inline-block; }
 
 /* ---- Hamburger (hidden on desktop) ----------------------------------- */
 .nav-toggle {

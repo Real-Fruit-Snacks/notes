@@ -3,7 +3,12 @@
 {% block content %}
 <article class="note graph-page">
   <h1 class="note-title">Graph</h1>
-  <p class="muted">Click a node to open the note. Drag to rearrange.</p>
+  <p class="muted">Click a node to open the note. Drag to rearrange, scroll to zoom, hover to highlight neighbours.</p>
+  <div class="graph-toolbar">
+    <input id="graph-search" type="search" placeholder="Filter notes…" autocomplete="off" aria-label="Filter graph nodes by title">
+    <label class="graph-toggle"><input type="checkbox" id="graph-orphans" checked> Show orphans</label>
+    <div id="graph-legend" class="graph-legend" role="group" aria-label="Toggle folders"></div>
+  </div>
   <div id="graph"></div>
 </article>
 {% endblock %}
