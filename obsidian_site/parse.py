@@ -69,8 +69,11 @@ class Parser:
             .use(callout_plugin)
             .use(unwrap_embeds_plugin)
         )
-        self.md.add_render_rule("wikilink", self._render_wikilink)
-        self.md.add_render_rule("hashtag", self._render_hashtag)
+        # Assign bound methods directly rather than via add_render_rule(),
+        # which re-binds the callable to the renderer with __get__ — on
+        # Python >= 3.11 that rebinds `self` away from this Parser.
+        self.md.renderer.rules["wikilink"] = self._render_wikilink
+        self.md.renderer.rules["hashtag"] = self._render_hashtag
 
     # -- public API -------------------------------------------------------
     def render(self, note: Note) -> RenderResult:
