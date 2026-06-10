@@ -3,8 +3,8 @@
 A small Python generator that turns an [Obsidian](https://obsidian.md) vault into a
 polished, browsable static website and publishes it to **GitHub Pages**.
 
-Only notes with `publish: true` in their frontmatter are included — everything else
-in your vault stays private.
+Only notes carrying the **`publish` tag** (in frontmatter `tags:` or as an inline
+`#publish`) are included — everything else in your vault stays private.
 
 ## Features
 
@@ -37,16 +37,19 @@ python build.py --vault vault --out dist --serve
 # open http://localhost:8000
 ```
 
-Point `--vault` at your real Obsidian vault to publish your own notes. Add
-`publish: true` to the frontmatter of any note you want on the site:
+Point `--vault` at your real Obsidian vault to publish your own notes. Tag any
+note you want on the site with `publish` — in frontmatter or inline:
 
 ```markdown
 ---
 title: My Note
-publish: true
-tags: [ideas]
+tags: [publish, ideas]
 ---
 ```
+
+…or just type `#publish` anywhere in the note body. The `publish` tag is a
+control marker: it never shows up as a tag chip or tag page on the site.
+(Legacy `publish: true` frontmatter also still works.)
 
 ## CLI
 
@@ -86,7 +89,7 @@ The build is a small pipeline, one module per stage in `obsidian_site/`:
 
 | Stage | Module | Job |
 |-------|--------|-----|
-| 1 | `discover.py` | Walk the vault, parse frontmatter, keep `publish: true` notes, assign slugs. |
+| 1 | `discover.py` | Walk the vault, parse frontmatter, keep `publish`-tagged notes, assign slugs. |
 | 2 | `parse.py` (+ `rules/`) | Render Markdown → HTML with wikilinks, embeds, callouts, code highlighting. |
 | 3 | `graph.py` | Build backlinks and the graph dataset from resolved links. |
 | 4 | `render.py` | Wrap notes in the docs layout (Jinja2); emit tag pages, graph page, search index. |

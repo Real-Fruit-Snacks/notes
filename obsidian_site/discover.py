@@ -18,6 +18,15 @@ _SLUG_STRIP = re.compile(r"[^a-z0-9/\- ]+")
 _SLUG_SPACES = re.compile(r"[\s_]+")
 _SLUG_DASHES = re.compile(r"-{2,}")
 
+# The tag that marks a note as published. It is a control marker, not content:
+# it never renders as a chip and gets no tag page.
+PUBLISH_TAG = "publish"
+# Inline `#publish` with the same word boundaries the hashtag rule uses.
+_PUBLISH_INLINE = re.compile(r"(?<![\w/#])#publish(?![\w/-])", re.IGNORECASE)
+# Fenced blocks and inline code, stripped before the inline scan so a note
+# *documenting* the #publish marker is not itself published.
+_CODE = re.compile(r"```.*?```|`[^`\n]*`", re.DOTALL)
+
 
 def slugify(text: str) -> str:
     """Turn arbitrary text into a url-safe slug, preserving ``/`` separators."""
@@ -46,8 +55,16 @@ def _normalise_tags(value) -> list[str]:
 
 
 def is_published(post: frontmatter.Post) -> bool:
-    """A note is published iff frontmatter ``publish`` is truthy (bool ``true``)."""
-    return post.get("publish") is True
+    """A note is published iff it carries the ``publish`` tag.
+
+    The tag counts in frontmatter ``tags:`` or as an inline ``#publish`` in
+    the body (outside code). Legacy ``publish: true`` frontmatter still works.
+    """
+    if post.get("publish") is True:
+        return True
+    if any(t.lower() == PUBLISH_TAG for t in _normalise_tags(post.get("tags"))):
+        return True
+    return bool(_PUBLISH_INLINE.search(_CODE.sub("", post.content)))
 
 
 def discover(config: SiteConfig) -> tuple[list[Note], dict[str, str]]:
@@ -119,7 +136,7 @@ def discover_with_warnings(config: SiteConfig) -> tuple[list[Note], list[str]]:
                 slug=slug,
                 frontmatter=dict(post.metadata),
                 body=post.content,
-                tags=_normalise_tags(post.get("tags")),
+                tags=[t for t in _normalise_tags(post.get("tags")) if t.lower() != PUBLISH_TAG],
             )
         )
 

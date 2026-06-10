@@ -13,6 +13,8 @@ import re
 
 from markdown_it.token import Token
 
+from ..discover import PUBLISH_TAG
+
 TAG_RE = re.compile(r"#([A-Za-z][\w/-]*)")
 
 
@@ -26,22 +28,26 @@ def _split(text_token: Token, env: dict, record: bool) -> list[Token]:
     content = text_token.content
     out: list[Token] = []
     last = 0
+    matched = False
     for m in TAG_RE.finditer(content):
         start = m.start()
         prev = content[start - 1] if start > 0 else ""
         if prev.isalnum() or prev in "_/#":  # not a word boundary -> not a tag
             continue
+        matched = True
         if start > last:
             out.append(_text(content[last:start]))
+        last = m.end()
         tag = m.group(1)
+        if tag.lower() == PUBLISH_TAG:
+            continue  # control marker, not content: drop it from the output
         tok = Token("hashtag", "", 0)
         tok.content = tag
         tok.meta = {"tag": tag}
         out.append(tok)
         if record:
             env["result"].tags.add(tag)
-        last = m.end()
-    if not out:
+    if not matched:
         return [text_token]
     if last < len(content):
         out.append(_text(content[last:]))
