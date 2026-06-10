@@ -74,3 +74,6 @@ def test_canonical_on_index_and_tag_pages(tmp_path, vault_path):
     assert '<link rel="canonical" href="https://example.com/myrepo/index.html">' in index
     note = (cfg.out / "welcome.html").read_text()
     assert '<link rel="canonical" href="https://example.com/myrepo/welcome.html">' in note
+    tag = (cfg.out / "tags" / "demo.html").read_text()
+    assert '<link rel="canonical" href="https://example.com/myrepo/tags/demo.html">' in tag
+    assert 'rel="canonical"' not in (cfg.out / "404.html").read_text()
