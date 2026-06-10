@@ -551,6 +551,14 @@ pre.highlight:hover .copy-btn, .copy-btn:focus { opacity: 1; }
     color-scheme: light;
     --bg: #ffffff; --bg-alt: #ffffff; --text: #111111; --muted: #555555;
     --border: #cccccc; --accent: #1e66f5; --code-bg: #f6f6f6;
+    /* Pin accents to the light palette so dark-theme pastels never print on white. */
+    --ctp-text: #4c4f69; --ctp-subtext0: #6c6f85; --ctp-overlay1: #8c8fa1;
+    --ctp-surface0: #ccd0da; --ctp-surface1: #bcc0cc;
+    --ctp-mantle: #ffffff; --ctp-crust: #f6f6f6;
+    --ctp-blue: #1e66f5; --ctp-sapphire: #209fb5; --ctp-lavender: #7287fd;
+    --ctp-green: #40a02b; --ctp-teal: #179299; --ctp-yellow: #df8e1d;
+    --ctp-peach: #fe640b; --ctp-pink: #ea76cb; --ctp-red: #d20f39;
+    --ctp-mauve: #8839ef;
   }
   html { font-size: 11pt; }
   .topbar, .sidebar, .scrim, .to-top, .nav-toggle, .search, .toc,
