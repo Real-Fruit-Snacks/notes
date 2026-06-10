@@ -76,6 +76,12 @@ python build.py --vault PATH --out DIR [options]
 3. Push to `main`. The included workflow (`.github/workflows/deploy.yml`) builds the
    site and deploys it. Your site appears at `https://<user>.github.io/<repo>/`.
 
+## Deploy to GitLab Pages
+
+A ready-to-use `.gitlab-ci.yml` is included — push the repo to GitLab and Pages
+deploys automatically, no settings to flip. See **[GITLAB.md](GITLAB.md)** for
+the full walkthrough (including pushing to GitHub and GitLab simultaneously).
+
 ## Development
 
 ```bash

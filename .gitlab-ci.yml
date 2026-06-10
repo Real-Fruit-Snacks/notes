@@ -1,0 +1,33 @@
+# GitLab Pages deployment.
+#
+# Mirrors .github/workflows/deploy.yml: install vendored wheels offline,
+# run the test suite (a failure keeps the previous site version live),
+# build, publish. The job MUST be named `pages` and the output directory
+# MUST be `public/` — both are GitLab Pages conventions.
+#
+# See GITLAB.md for setup instructions.
+
+image: python:3.11
+
+pages:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    # Offline install from the vendored wheels — no PyPI access needed.
+    - pip install --no-index --find-links wheels -r requirements-dev.txt
+    - python -m pytest tests/ -q
+    # Split CI_PAGES_URL into origin + base path so project pages
+    # (https://user.gitlab.io/project), user sites (https://user.gitlab.io)
+    # and unique domains (https://project-123.gitlab.io) all link correctly.
+    - SITE_URL=$(echo "$CI_PAGES_URL" | sed -E 's#^(https?://[^/]+).*#\1#')
+    - BASE_URL=$(echo "$CI_PAGES_URL" | sed -E 's#^https?://[^/]+##')
+    - python build.py
+        --vault vault
+        --out public
+        --base-url "${BASE_URL:-/}"
+        --site-url "$SITE_URL"
+        --title "My Notes"
+  artifacts:
+    paths:
+      - public
