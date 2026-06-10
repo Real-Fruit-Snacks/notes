@@ -1,0 +1,16 @@
+# Build output
+dist/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+.obsidian/
+
+# Local tooling state
+.omc/
+.claude/

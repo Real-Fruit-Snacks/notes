@@ -1,0 +1,5 @@
+markdown-it-py>=3.0
+mdit-py-plugins>=0.4
+python-frontmatter>=1.1
+Pygments>=2.17
+Jinja2>=3.1

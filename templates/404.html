@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note">
+  <h1 class="note-title">404 — note not found</h1>
+  <p class="muted">That page doesn't exist (or isn't published).</p>
+  <p><a href="{{ base_url }}index.html">← Back home</a> · <a href="{{ base_url }}graph.html">Open the graph</a></p>
+</article>
+{% endblock %}

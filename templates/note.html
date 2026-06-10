@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% set current_slug = note.slug %}
+{% block title %}{{ note.title }} · {{ site_title }}{% endblock %}
+{% block head %}
+  <meta name="description" content="{{ note.description }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ note.title }}">
+  <meta property="og:description" content="{{ note.description }}">
+  {% if site_url %}<meta property="og:url" content="{{ abs_url(note.url) }}">
+  <link rel="canonical" href="{{ abs_url(note.url) }}">{% endif %}
+{% endblock %}
+{% block content %}
+<article class="note">
+  {% if breadcrumbs %}
+  <nav class="breadcrumbs">{{ breadcrumbs | join(" / ") }}</nav>
+  {% endif %}
+  <h1 class="note-title">{{ note.title }}</h1>
+
+  <div class="note-meta">
+    {% if note.date %}<span class="note-date">{{ note.date }}</span>{% endif %}
+    <span class="reading-time">{{ note.reading_minutes }} min read</span>
+    {% if note.tags %}
+    <span class="tag-chips">
+      {% for tag in note.tags %}
+      <a class="tag-chip" href="{{ base_url }}tags/{{ tag | slugify }}.html">{{ tag }}</a>
+      {% endfor %}
+    </span>
+    {% endif %}
+  </div>
+
+  {% set toc = note.headings | selectattr("level", "ge", 2) | list %}
+  {% if toc | length >= 2 %}
+  <details class="toc">
+    <summary>Contents</summary>
+    <ul>
+      {% for h in toc %}
+      <li class="toc-h{{ h.level }}"><a href="#{{ h.id }}">{{ h.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+
+  <div class="note-body">
+    {{ note.html | safe }}
+  </div>
+
+  {% if backlinks %}
+  <section class="backlinks">
+    <h2>Linked mentions</h2>
+    <ul>
+      {% for b in backlinks %}
+      <li><a class="internal-link" data-slug="{{ b.slug }}" href="{{ base_url }}{{ b.url }}">{{ b.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <details class="local-graph">
+    <summary>Local graph</summary>
+    <div id="local-graph" data-slug="{{ note.slug }}"></div>
+  </details>
+
+  {% if prev_note or next_note %}
+  <nav class="prev-next">
+    {% if prev_note %}
+    <a class="pn-prev" href="{{ base_url }}{{ prev_note.url }}">
+      <span class="pn-label">← Previous</span>
+      <span class="pn-title">{{ prev_note.title }}</span>
+    </a>
+    {% else %}<span></span>{% endif %}
+    {% if next_note %}
+    <a class="pn-next" href="{{ base_url }}{{ next_note.url }}">
+      <span class="pn-label">Next →</span>
+      <span class="pn-title">{{ next_note.title }}</span>
+    </a>
+    {% else %}<span></span>{% endif %}
+  </nav>
+  {% endif %}
+</article>
+{% endblock %}

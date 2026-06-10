@@ -1,0 +1,56 @@
+{% from "_macros.html" import nav_tree %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>{% block title %}{{ site_title }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ base_url }}assets/site.css">
+  <link rel="stylesheet" href="{{ base_url }}assets/pygments.css">
+  <link rel="alternate" type="application/rss+xml" title="{{ site_title }}" href="{{ base_url }}feed.xml">
+  {% block head %}{% endblock %}
+</head>
+<body data-base-url="{{ base_url }}">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <button id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <a class="brand" href="{{ base_url }}index.html">{{ site_title }}</a>
+    <div class="search">
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input type="search" id="search-input" placeholder="Search notes…" autocomplete="off" aria-label="Search">
+      <kbd class="search-hint" aria-hidden="true">/</kbd>
+      <ul id="search-results" class="search-results" hidden></ul>
+    </div>
+    <nav class="topnav">
+      <a href="{{ base_url }}graph.html">Graph</a>
+    </nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-tools" id="sidebar-tools">
+        <button class="tool-btn" id="expand-all" title="Expand all folders" type="button">Expand all</button>
+        <button class="tool-btn" id="collapse-all" title="Collapse all folders" type="button">Collapse all</button>
+      </div>
+      {{ nav_tree(nav, current_slug | default(none)) }}
+    </aside>
+    <div class="scrim" id="scrim" hidden></div>
+    <main class="content" id="main">
+      {% block content %}{% endblock %}
+      <footer class="site-footer">
+        <span>Built with <a href="{{ base_url }}index.html">{{ site_title }}</a></span>
+        <a href="{{ base_url }}feed.xml">RSS</a>
+      </footer>
+    </main>
+  </div>
+  <button id="to-top" class="to-top" aria-label="Back to top" hidden>↑</button>
+  <div id="link-preview" class="link-preview" hidden></div>
+  <script src="{{ base_url }}assets/vendor/minisearch.min.js"></script>
+  <script src="{{ base_url }}assets/search.js"></script>
+  <script src="{{ base_url }}assets/nav.js"></script>
+  <script src="{{ base_url }}assets/code.js"></script>
+  <script src="{{ base_url }}assets/previews.js"></script>
+  <script src="{{ base_url }}assets/localgraph.js"></script>
+  <script src="{{ base_url }}assets/chrome.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

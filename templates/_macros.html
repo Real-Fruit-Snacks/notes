@@ -1,0 +1,18 @@
+{% macro nav_tree(items, current_slug) -%}
+<ul class="nav-list">
+  {%- for item in items %}
+    {%- if item.type == "folder" %}
+    <li class="nav-folder">
+      <details open>
+        <summary>{{ item.name }}</summary>
+        {{ nav_tree(item.children, current_slug) }}
+      </details>
+    </li>
+    {%- else %}
+    <li class="nav-note{% if item.slug == current_slug %} active{% endif %}">
+      <a href="{{ base_url }}{{ item.url }}">{{ item.name }}</a>
+    </li>
+    {%- endif %}
+  {%- endfor %}
+</ul>
+{%- endmacro %}

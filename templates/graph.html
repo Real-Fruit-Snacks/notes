@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Graph · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note graph-page">
+  <h1 class="note-title">Graph</h1>
+  <p class="muted">Click a node to open the note. Drag to rearrange.</p>
+  <div id="graph"></div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/vendor/d3.min.js"></script>
+<script src="{{ base_url }}assets/graph.js"></script>
+{% endblock %}

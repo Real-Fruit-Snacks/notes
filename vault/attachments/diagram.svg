@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="200" viewBox="0 0 520 200" font-family="sans-serif">
+  <rect width="520" height="200" rx="12" fill="#f7f8fa"/>
+  <g stroke="#2563eb" stroke-width="2">
+    <line x1="120" y1="100" x2="260" y2="100"/>
+    <line x1="260" y1="100" x2="400" y2="100"/>
+  </g>
+  <g fill="#2563eb">
+    <circle cx="120" cy="100" r="34"/>
+    <circle cx="260" cy="100" r="34"/>
+    <circle cx="400" cy="100" r="34"/>
+  </g>
+  <g fill="#ffffff" font-size="14" text-anchor="middle">
+    <text x="120" y="105">Capture</text>
+    <text x="260" y="105">Connect</text>
+    <text x="400" y="105">Create</text>
+  </g>
+  <text x="260" y="180" text-anchor="middle" fill="#6b7280" font-size="13">The note-taking loop</text>
+</svg>

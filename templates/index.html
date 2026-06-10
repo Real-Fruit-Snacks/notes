@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<article class="note">
+  <h1 class="note-title">{{ site_title }}</h1>
+  <p class="muted">{{ notes | length }} published note{{ "s" if notes | length != 1 }}.
+    Explore the <a href="{{ base_url }}graph.html">graph</a> or browse below.</p>
+
+  {% if all_tags %}
+  <div class="tag-chips">
+    {% for tag in all_tags %}
+    <a class="tag-chip" href="{{ base_url }}tags/{{ tag | slugify }}.html">{{ tag }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <ul class="note-list">
+    {% for n in notes %}
+    <li><a href="{{ base_url }}{{ n.url }}">{{ n.title }}</a></li>
+    {% endfor %}
+  </ul>
+</article>
+{% endblock %}
