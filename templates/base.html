@@ -15,7 +15,7 @@
       }
       document.documentElement.setAttribute("data-theme", t);
       if (t === "light") {
-        var m = document.getElementById("meta-theme-color");
+        var m = document.querySelector('meta[name="theme-color"]');
         if (m) m.setAttribute("content", "#eff1f5");
       }
     })();
@@ -39,7 +39,7 @@
     </div>
     <nav class="topnav">
       <a href="{{ base_url }}graph.html">Graph</a>
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme">☀</button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">☀</button>
     </nav>
   </header>
   <div class="layout">

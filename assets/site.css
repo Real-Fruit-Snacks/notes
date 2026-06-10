@@ -47,6 +47,7 @@
   --accent-soft: rgba(137, 180, 250, 0.15);
   --broken: var(--ctp-red);
   --code-bg: var(--ctp-crust);
+  --scrim-bg: rgba(17, 17, 27, 0.6);
 
   --sidebar-w: 260px;
   --topbar-h: 56px;
@@ -81,6 +82,7 @@ html[data-theme="light"] {
 
   --accent-soft: rgba(30, 102, 245, 0.10);
   --code-bg: var(--ctp-mantle);
+  --scrim-bg: rgba(76, 79, 105, 0.4);
 }
 html[data-theme="light"] ::selection { background: rgba(136, 57, 239, 0.18); }
 
@@ -401,7 +403,7 @@ pre.highlight[data-lang]:not([data-lang=""])::before {
 .theme-toggle:hover { background: var(--accent-soft); }
 .scrim {
   position: fixed; inset: 0; z-index: 15;
-  background: rgba(17, 17, 27, 0.6);
+  background: var(--scrim-bg);
 }
 
 /* ---- Table of contents ----------------------------------------------- */
