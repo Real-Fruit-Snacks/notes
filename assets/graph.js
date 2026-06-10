@@ -11,9 +11,14 @@
     .then(draw)
     .catch(function () { mount.textContent = "Could not load graph data."; });
 
-  // Catppuccin Mocha accents, assigned to folders in name order.
-  var PALETTE = ["#89b4fa", "#a6e3a1", "#fab387", "#f38ba8", "#cba6f7",
-                 "#94e2d5", "#f9e2af", "#f5c2e7", "#89dceb", "#b4befe"];
+  // Catppuccin accents, read from CSS variables so they follow the theme.
+  var PALETTE_VARS = ["--ctp-blue", "--ctp-green", "--ctp-peach", "--ctp-red",
+                      "--ctp-mauve", "--ctp-teal", "--ctp-yellow", "--ctp-pink",
+                      "--ctp-sapphire", "--ctp-lavender"];
+  function palette() {
+    var cs = getComputedStyle(document.documentElement);
+    return PALETTE_VARS.map(function (v) { return cs.getPropertyValue(v).trim(); });
+  }
 
   function folderOf(id) {
     return id.indexOf("/") > -1 ? id.slice(0, id.indexOf("/")) : "";
@@ -30,7 +35,11 @@
       new Set(data.nodes.map(function (n) { return folderOf(n.id); }))
     ).sort();
     var colour = {};
-    folders.forEach(function (f, i) { colour[f] = PALETTE[i % PALETTE.length]; });
+    function recolour() {
+      var p = palette();
+      folders.forEach(function (f, i) { colour[f] = p[i % p.length]; });
+    }
+    recolour();
 
     var degree = {};
     var neighbours = {};
@@ -136,6 +145,7 @@
     }
 
     // -- toolbar controls ---------------------------------------------------
+    var swatches = {};
     var legend = document.getElementById("graph-legend");
     if (legend) {
       folders.forEach(function (f) {
@@ -145,6 +155,7 @@
         var swatch = document.createElement("span");
         swatch.className = "legend-swatch";
         swatch.style.background = colour[f];
+        swatches[f] = swatch;
         btn.appendChild(swatch);
         btn.appendChild(document.createTextNode(f || "root"));
         btn.addEventListener("click", function () {
@@ -171,5 +182,14 @@
         apply();
       });
     }
+
+    // Re-read palette colours when the theme toggles.
+    document.addEventListener("themechange", function () {
+      recolour();
+      node.select("circle").attr("fill", function (d) { return colour[folderOf(d.id)]; });
+      folders.forEach(function (f) {
+        if (swatches[f]) swatches[f].style.background = colour[f];
+      });
+    });
   }
 })();
