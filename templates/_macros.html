@@ -3,7 +3,7 @@
   {%- for item in items %}
     {%- if item.type == "folder" %}
     <li class="nav-folder">
-      <details open>
+      <details>
         <summary>{{ item.name }}</summary>
         {{ nav_tree(item.children, current_slug) }}
       </details>

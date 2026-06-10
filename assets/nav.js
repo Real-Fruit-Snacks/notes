@@ -28,6 +28,17 @@
   });
 })();
 
+// Folders start collapsed; reveal the current note by expanding only the
+// folders on its path.
+(function () {
+  var active = document.querySelector(".sidebar .nav-note.active");
+  var d = active && active.closest("details");
+  while (d) {
+    d.open = true;
+    d = d.parentElement && d.parentElement.closest("details");
+  }
+})();
+
 // Expand-all / collapse-all controls for the sidebar folder tree.
 (function () {
   var sidebar = document.getElementById("sidebar");
