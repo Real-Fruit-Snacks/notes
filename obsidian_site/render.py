@@ -134,7 +134,7 @@ class Renderer:
             "icons": [
                 {"src": self._url("assets/favicon.svg"), "sizes": "any", "type": "image/svg+xml"}
             ],
-        })
+        }, ensure_ascii=False)
 
         pages["graph.json"] = json.dumps(graph_data)
         pages["search.json"] = json.dumps(self._search_index(notes))

@@ -1,6 +1,8 @@
 """Tests for the professional-polish pass: theming, favicon, robots, print."""
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from obsidian_site.builder import build_site
@@ -41,8 +43,9 @@ def test_pygments_css_covers_both_themes(config):
 def test_favicon_and_manifest(config):
     build_site(config)
     assert (config.out / "assets" / "favicon.svg").exists()
-    manifest = (config.out / "site.webmanifest").read_text()
-    assert "My Notes" in manifest
+    data = json.loads((config.out / "site.webmanifest").read_text())
+    assert data["name"] == "My Notes"
     html = (config.out / "welcome.html").read_text()
     assert 'rel="icon"' in html
+    assert 'type="image/svg+xml"' in html
     assert 'rel="manifest"' in html
