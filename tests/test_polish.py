@@ -34,3 +34,15 @@ def test_pygments_css_covers_both_themes(config):
     # The container background rules must be stripped (theme var controls it).
     assert ".highlight { background" not in css
     assert css.count("line-height: 125%") == 1   # boilerplate emitted once
+
+
+# --- favicon + manifest --------------------------------------------------------
+
+def test_favicon_and_manifest(config):
+    build_site(config)
+    assert (config.out / "assets" / "favicon.svg").exists()
+    manifest = (config.out / "site.webmanifest").read_text()
+    assert "My Notes" in manifest
+    html = (config.out / "welcome.html").read_text()
+    assert 'rel="icon"' in html
+    assert 'rel="manifest"' in html

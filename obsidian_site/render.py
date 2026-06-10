@@ -124,6 +124,18 @@ class Renderer:
 
         pages["404.html"] = self.env.get_template("404.html").render(nav=nav)
 
+        pages["site.webmanifest"] = json.dumps({
+            "name": self.config.site_title,
+            "short_name": self.config.site_title,
+            "start_url": self.config.base_url,
+            "display": "minimal-ui",
+            "background_color": "#1e1e2e",
+            "theme_color": "#1e1e2e",
+            "icons": [
+                {"src": self._url("assets/favicon.svg"), "sizes": "any", "type": "image/svg+xml"}
+            ],
+        })
+
         pages["graph.json"] = json.dumps(graph_data)
         pages["search.json"] = json.dumps(self._search_index(notes))
         pages["excerpts.json"] = json.dumps(self._excerpts(notes))
