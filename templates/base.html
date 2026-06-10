@@ -3,7 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#1e1e2e" id="meta-theme-color">
+  <script>
+    // Set the theme before first paint so there is no flash of wrong theme.
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") {
+        t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
+          ? "light" : "dark";
+      }
+      document.documentElement.setAttribute("data-theme", t);
+      if (t === "light") {
+        var m = document.getElementById("meta-theme-color");
+        if (m) m.setAttribute("content", "#eff1f5");
+      }
+    })();
+  </script>
   <title>{% block title %}{{ site_title }}{% endblock %}</title>
   <link rel="stylesheet" href="{{ base_url }}assets/site.css">
   <link rel="stylesheet" href="{{ base_url }}assets/pygments.css">
@@ -23,6 +39,7 @@
     </div>
     <nav class="topnav">
       <a href="{{ base_url }}graph.html">Graph</a>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme">☀</button>
     </nav>
   </header>
   <div class="layout">
