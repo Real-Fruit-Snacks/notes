@@ -12,6 +12,8 @@ from pygments.token import (
     String, Text, Whitespace,
 )
 
+# Palettes carry the full accent set; "teal" and "lavender" are currently
+# unused by _styles() but kept so palettes stay complete for future tokens.
 MOCHA = {
     "pink": "#f5c2e7", "mauve": "#cba6f7", "red": "#f38ba8", "maroon": "#eba0ac",
     "peach": "#fab387", "yellow": "#f9e2af", "green": "#a6e3a1", "teal": "#94e2d5",
@@ -30,6 +32,10 @@ LATTE = {
 
 
 def _styles(c: dict[str, str]) -> dict:
+    """Build the Pygments token-style dict from a Catppuccin palette mapping.
+
+    *c* must provide the keys present in :data:`MOCHA` / :data:`LATTE`.
+    """
     return {
         Text: c["text"],
         Whitespace: c["text"],

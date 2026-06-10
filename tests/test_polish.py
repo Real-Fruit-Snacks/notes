@@ -31,3 +31,6 @@ def test_pygments_css_covers_both_themes(config):
     assert '[data-theme="light"] .highlight' in css
     assert "#8839ef" in css.lower()   # Latte mauve (keywords)
     assert "#cba6f7" in css.lower()   # Mocha mauve still present
+    # The container background rules must be stripped (theme var controls it).
+    assert ".highlight { background" not in css
+    assert css.count("line-height: 125%") == 1   # boilerplate emitted once

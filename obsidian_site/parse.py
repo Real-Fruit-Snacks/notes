@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import html
 import posixpath
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -169,17 +170,23 @@ def pygments_css() -> str:
     Mocha rules are emitted unscoped (dark is the default theme); Latte rules
     are scoped under ``[data-theme="light"]``. The container-background rule of
     each is dropped so our theme variable (``--code-bg``) controls the block
-    background.
+    background, and the unscoped pre/linenos boilerplate (which Pygments does
+    not prefix with the scope) is kept only once, from the Mocha pass.
     """
-    import re
-
     from .pygments_catppuccin import CatppuccinLatte, CatppuccinMocha
 
-    def defs(style, scope: str) -> str:
+    boilerplate = re.compile(
+        r"^(?:pre|td\.linenos[^{]*|span\.linenos[^{]*)\s*\{[^}]*\}\n?", re.MULTILINE
+    )
+
+    def defs(style, scope: str, strip_boilerplate: bool = False) -> str:
         css = HtmlFormatter(style=style, cssclass="highlight").get_style_defs(scope)
         # Remove the standalone container rule (incl. background) for `scope`.
-        return re.sub(re.escape(scope) + r"\s*\{[^}]*\}", "", css, count=1).strip()
+        css = re.sub(re.escape(scope) + r"\s*\{[^}]*\}", "", css, count=1)
+        if strip_boilerplate:
+            css = boilerplate.sub("", css)
+        return css.strip()
 
     mocha = defs(CatppuccinMocha, ".highlight")
-    latte = defs(CatppuccinLatte, '[data-theme="light"] .highlight')
+    latte = defs(CatppuccinLatte, '[data-theme="light"] .highlight', strip_boilerplate=True)
     return mocha + "\n\n/* Light theme (Catppuccin Latte) */\n" + latte
