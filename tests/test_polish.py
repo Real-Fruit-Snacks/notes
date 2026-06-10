@@ -58,6 +58,7 @@ def test_robots_txt_with_site_url(tmp_path, vault_path):
                      site_url="https://example.com")
     build_site(cfg)
     robots = (cfg.out / "robots.txt").read_text()
+    assert robots.startswith("User-agent: *\nAllow: /")
     assert "Sitemap: https://example.com/myrepo/sitemap.xml" in robots
 
 
@@ -76,4 +77,5 @@ def test_canonical_on_index_and_tag_pages(tmp_path, vault_path):
     assert '<link rel="canonical" href="https://example.com/myrepo/welcome.html">' in note
     tag = (cfg.out / "tags" / "demo.html").read_text()
     assert '<link rel="canonical" href="https://example.com/myrepo/tags/demo.html">' in tag
+    assert '<link rel="canonical" href="https://example.com/myrepo/graph.html">' in (cfg.out / "graph.html").read_text()
     assert 'rel="canonical"' not in (cfg.out / "404.html").read_text()
