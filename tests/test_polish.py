@@ -49,3 +49,28 @@ def test_favicon_and_manifest(config):
     assert 'rel="icon"' in html
     assert 'type="image/svg+xml"' in html
     assert 'rel="manifest"' in html
+
+
+# --- robots.txt + canonical ----------------------------------------------------
+
+def test_robots_txt_with_site_url(tmp_path, vault_path):
+    cfg = SiteConfig(vault=vault_path, out=tmp_path / "dist", base_url="/myrepo/",
+                     site_url="https://example.com")
+    build_site(cfg)
+    robots = (cfg.out / "robots.txt").read_text()
+    assert "Sitemap: https://example.com/myrepo/sitemap.xml" in robots
+
+
+def test_no_robots_txt_without_site_url(config):
+    build_site(config)
+    assert not (config.out / "robots.txt").exists()
+
+
+def test_canonical_on_index_and_tag_pages(tmp_path, vault_path):
+    cfg = SiteConfig(vault=vault_path, out=tmp_path / "dist", base_url="/myrepo/",
+                     site_url="https://example.com")
+    build_site(cfg)
+    index = (cfg.out / "index.html").read_text()
+    assert '<link rel="canonical" href="https://example.com/myrepo/index.html">' in index
+    note = (cfg.out / "welcome.html").read_text()
+    assert '<link rel="canonical" href="https://example.com/myrepo/welcome.html">' in note

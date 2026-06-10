@@ -136,6 +136,12 @@ class Renderer:
             ],
         }, ensure_ascii=False)
 
+        if self.config.site_url:
+            pages["robots.txt"] = (
+                "User-agent: *\nAllow: /\n\n"
+                f"Sitemap: {self.config.abs_url('sitemap.xml')}\n"
+            )
+
         pages["graph.json"] = json.dumps(graph_data)
         pages["search.json"] = json.dumps(self._search_index(notes))
         pages["excerpts.json"] = json.dumps(self._excerpts(notes))
