@@ -67,6 +67,8 @@ class Note:
     backlinks: list[str] = field(default_factory=list)     # slugs linking *to* this note
     headings: list[dict] = field(default_factory=list)     # {level, text, id} for the ToC
     excerpt: str = ""                                       # plain-text summary
+    has_math: bool = False     # page contains $...$ / $$...$$ (loads KaTeX)
+    has_mermaid: bool = False  # page contains a mermaid fence (loads mermaid)
 
     @property
     def description(self) -> str:

@@ -8,6 +8,13 @@
   <meta property="og:title" content="{{ note.title }}">
   <meta property="og:description" content="{{ note.description }}">
   {% if site_url %}<meta property="og:url" content="{{ abs_url(note.url) }}">{% endif %}
+  {% if note.has_math %}<link rel="stylesheet" href="{{ base_url }}assets/vendor/katex/katex.min.css">{% endif %}
+{% endblock %}
+{% block scripts %}
+  {% if note.has_math %}
+  <script src="{{ base_url }}assets/vendor/katex/katex.min.js"></script>
+  <script src="{{ base_url }}assets/math.js"></script>
+  {% endif %}
 {% endblock %}
 {% block content %}
 <article class="note">

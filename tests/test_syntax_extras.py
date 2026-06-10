@@ -23,3 +23,18 @@ def test_footnotes_render(tmp_path):
     assert 'class="footnote-ref"' in html
     assert 'class="footnotes"' in html
     assert "The footnote." in html
+
+
+# --- math ----------------------------------------------------------------------
+
+def test_inline_and_block_math_render(tmp_path):
+    html = _build_one(tmp_path, "Euler: $e^{i\\pi}+1=0$\n\n$$\\int_0^1 x\\,dx$$")
+    assert '<span class="math math-inline">' in html
+    assert '<div class="math math-block">' in html
+    assert "vendor/katex/katex.min.js" in html       # lazy include present
+
+
+def test_no_katex_on_pages_without_math(config):
+    build_site(config)
+    html = (config.out / "welcome.html").read_text()
+    assert "katex" not in html

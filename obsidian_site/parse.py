@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.dollarmath import dollarmath_plugin
 from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 from pygments import highlight as pygments_highlight
@@ -66,6 +67,7 @@ class Parser:
             .enable(["table", "strikethrough"])
             .use(tasklists_plugin)
             .use(footnote_plugin)
+            .use(dollarmath_plugin, allow_labels=False)
             .use(wikilink_plugin)
             .use(hashtag_plugin)
             .use(heading_plugin)
@@ -77,6 +79,8 @@ class Parser:
         # Python >= 3.11 that rebinds `self` away from this Parser.
         self.md.renderer.rules["wikilink"] = self._render_wikilink
         self.md.renderer.rules["hashtag"] = self._render_hashtag
+        self.md.renderer.rules["math_inline"] = self._render_math_inline
+        self.md.renderer.rules["math_block"] = self._render_math_block
 
     # -- public API -------------------------------------------------------
     def render(self, note: Note) -> RenderResult:
@@ -132,6 +136,13 @@ class Parser:
         tag = tokens[idx].meta["tag"]
         href = posixpath.join(self.base_url, "tags", f"{slugify(tag)}.html")
         return f'<a class="tag-inline" href="{href}">#{html.escape(tag)}</a>'
+
+    def _render_math_inline(self, tokens, idx, options, env) -> str:
+        # Raw TeX, escaped; KaTeX renders it client-side (assets/math.js).
+        return f'<span class="math math-inline">{html.escape(tokens[idx].content)}</span>'
+
+    def _render_math_block(self, tokens, idx, options, env) -> str:
+        return f'<div class="math math-block">{html.escape(tokens[idx].content)}</div>\n'
 
     def _render_image(self, meta, env) -> str:
         target = meta["target"]

@@ -554,6 +554,9 @@ hr.footnotes-sep { border: 0; height: 1px; background: var(--border); margin: 2.
 .footnote-item > p:last-child { display: inline; margin: 0; }
 .footnote-backref { margin-left: .3rem; text-decoration: none; }
 
+/* ---- Math (KaTeX) ----------------------------------------------------- */
+.math-block { margin: 1.2rem 0; overflow-x: auto; }
+
 /* ---- Print ------------------------------------------------------------ */
 @media print {
   html[data-theme="dark"], html[data-theme="light"], :root {

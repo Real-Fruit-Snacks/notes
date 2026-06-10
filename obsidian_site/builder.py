@@ -35,6 +35,10 @@ def build_site(config: SiteConfig) -> list[str]:
         note.out_links = res.links
         note.headings = res.headings
         note.excerpt = excerpt_of(res.html)
+        # Inside fenced code these markers are HTML-escaped, so plain string
+        # search only matches real math/mermaid containers.
+        note.has_math = 'class="math math-' in res.html
+        note.has_mermaid = '<pre class="mermaid">' in res.html
         # Merge inline #tags with frontmatter tags (order-stable, de-duped).
         for tag in sorted(res.tags):
             if tag not in note.tags:
