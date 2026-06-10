@@ -164,17 +164,22 @@ class Parser:
 
 
 def pygments_css() -> str:
-    """Return the Pygments stylesheet (scoped to ``.highlight``).
+    """Return the Pygments stylesheet for both themes.
 
-    The container-background rule is dropped so our theme variable
-    (``--code-bg``) controls the block background in both light and dark mode.
+    Mocha rules are emitted unscoped (dark is the default theme); Latte rules
+    are scoped under ``[data-theme="light"]``. The container-background rule of
+    each is dropped so our theme variable (``--code-bg``) controls the block
+    background.
     """
     import re
 
-    from .pygments_catppuccin import CatppuccinMocha
+    from .pygments_catppuccin import CatppuccinLatte, CatppuccinMocha
 
-    # Exact Catppuccin Mocha token colours to match the rest of the site theme.
-    css = HtmlFormatter(style=CatppuccinMocha, cssclass="highlight").get_style_defs(".highlight")
-    # Remove the standalone ".highlight { ... }" container rule (incl. background).
-    css = re.sub(r"\.highlight\s*\{[^}]*\}", "", css, count=1)
-    return css.strip()
+    def defs(style, scope: str) -> str:
+        css = HtmlFormatter(style=style, cssclass="highlight").get_style_defs(scope)
+        # Remove the standalone container rule (incl. background) for `scope`.
+        return re.sub(re.escape(scope) + r"\s*\{[^}]*\}", "", css, count=1).strip()
+
+    mocha = defs(CatppuccinMocha, ".highlight")
+    latte = defs(CatppuccinLatte, '[data-theme="light"] .highlight')
+    return mocha + "\n\n/* Light theme (Catppuccin Latte) */\n" + latte

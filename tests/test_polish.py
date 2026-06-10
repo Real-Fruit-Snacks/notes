@@ -23,3 +23,11 @@ def test_css_has_light_theme_block(config):
     assert 'html[data-theme="light"]' in css
     assert "#eff1f5" in css        # Latte base
     assert "color-scheme: light" in css
+
+
+def test_pygments_css_covers_both_themes(config):
+    build_site(config)
+    css = (config.out / "assets" / "pygments.css").read_text()
+    assert '[data-theme="light"] .highlight' in css
+    assert "#8839ef" in css.lower()   # Latte mauve (keywords)
+    assert "#cba6f7" in css.lower()   # Mocha mauve still present
