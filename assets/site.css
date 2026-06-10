@@ -544,3 +544,22 @@ pre.highlight:hover .copy-btn, .copy-btn:focus { opacity: 1; }
 .prev-next .pn-title { color: var(--ctp-lavender); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .reading-time { color: var(--muted); font-size: .85rem; }
+
+/* ---- Print ------------------------------------------------------------ */
+@media print {
+  html[data-theme="dark"], html[data-theme="light"], :root {
+    color-scheme: light;
+    --bg: #ffffff; --bg-alt: #ffffff; --text: #111111; --muted: #555555;
+    --border: #cccccc; --accent: #1e66f5; --code-bg: #f6f6f6;
+  }
+  html { font-size: 11pt; }
+  .topbar, .sidebar, .scrim, .to-top, .nav-toggle, .search, .toc,
+  .local-graph, .prev-next, .site-footer, .copy-btn, .heading-anchor,
+  .skip-link, #link-preview { display: none !important; }
+  .layout { display: block; }
+  .content { padding: 0; }
+  .note { max-width: none; }
+  body { background: #ffffff; }
+  a { color: inherit; text-decoration: underline; }
+  .note-body pre, .highlight { white-space: pre-wrap; border: 1px solid #cccccc; }
+}

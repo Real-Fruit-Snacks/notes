@@ -79,3 +79,11 @@ def test_canonical_on_index_and_tag_pages(tmp_path, vault_path):
     assert '<link rel="canonical" href="https://example.com/myrepo/tags/demo.html">' in tag
     assert '<link rel="canonical" href="https://example.com/myrepo/graph.html">' in (cfg.out / "graph.html").read_text()
     assert 'rel="canonical"' not in (cfg.out / "404.html").read_text()
+
+
+# --- print stylesheet ----------------------------------------------------------
+
+def test_print_styles_present(config):
+    build_site(config)
+    css = (config.out / "assets" / "site.css").read_text()
+    assert "@media print" in css
