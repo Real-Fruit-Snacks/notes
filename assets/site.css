@@ -545,6 +545,14 @@ pre.highlight:hover .copy-btn, .copy-btn:focus { opacity: 1; }
 
 .reading-time { color: var(--muted); font-size: .85rem; }
 
+/* ---- Footnotes -------------------------------------------------------- */
+.footnote-ref a { font-size: .78em; }
+hr.footnotes-sep { border: 0; height: 1px; background: var(--border); margin: 2.5rem 0 1rem; }
+.footnotes { font-size: .9rem; color: var(--muted); }
+.footnotes-list { padding-left: 1.4rem; }
+.footnotes-list p { display: inline; margin: 0; }
+.footnote-backref { margin-left: .3rem; text-decoration: none; }
+
 /* ---- Print ------------------------------------------------------------ */
 @media print {
   html[data-theme="dark"], html[data-theme="light"], :root {

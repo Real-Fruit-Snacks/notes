@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from markdown_it import MarkdownIt
+from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 from pygments import highlight as pygments_highlight
 from pygments.formatters import HtmlFormatter
@@ -64,6 +65,7 @@ class Parser:
             MarkdownIt("commonmark", {"highlight": _highlight, "html": True})
             .enable(["table", "strikethrough"])
             .use(tasklists_plugin)
+            .use(footnote_plugin)
             .use(wikilink_plugin)
             .use(hashtag_plugin)
             .use(heading_plugin)
