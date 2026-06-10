@@ -550,7 +550,8 @@ pre.highlight:hover .copy-btn, .copy-btn:focus { opacity: 1; }
 hr.footnotes-sep { border: 0; height: 1px; background: var(--border); margin: 2.5rem 0 1rem; }
 .footnotes { font-size: .9rem; color: var(--muted); }
 .footnotes-list { padding-left: 1.4rem; }
-.footnotes-list p { display: inline; margin: 0; }
+.footnotes-list p { margin: .25rem 0; }
+.footnote-item > p:last-child { display: inline; margin: 0; }
 .footnote-backref { margin-left: .3rem; text-decoration: none; }
 
 /* ---- Print ------------------------------------------------------------ */
