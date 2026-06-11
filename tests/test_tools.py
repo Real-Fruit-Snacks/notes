@@ -108,3 +108,12 @@ def test_topbar_has_tools_dropdown(config):
     assert ">Character Inspector</a>" in html
     assert 'href="/myrepo/tools/subnet.html"' in html
     assert ">Subnet Calculator</a>" in html
+
+
+def test_subnet_wiki_present(config):
+    build_site(config)
+    html = (config.out / "tools" / "subnet.html").read_text(encoding="utf-8")
+    assert 'id="subnet-wiki"' in html
+    assert html.count('class="wiki-entry"') == 9
+    assert '<span data-wiki="broadcast">192.168.1.255</span>' in html
+    assert '<span data-wiki="netmask">255.255.255.0</span>' in html

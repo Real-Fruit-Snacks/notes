@@ -22,6 +22,87 @@
     <p class="subnet-legend muted"><span class="legend-net">network bits</span> · <span class="legend-host">host bits</span></p>
     <dl id="subnet-facts" class="subnet-facts" aria-live="polite" aria-atomic="true"></dl>
   </div>
+  <section class="subnet-wiki" id="subnet-wiki">
+    <h2>Understanding the output</h2>
+    <details class="wiki-entry">
+      <summary>CIDR &amp; the prefix</summary>
+      <p>An address block in CIDR notation is the network address plus a prefix
+      length: <span data-wiki="cidr">192.168.1.0/24</span>. The prefix —
+      /<span data-wiki="prefix">24</span> here — is how many of the address's 32
+      bits are locked in as the network part; the remaining
+      <span data-wiki="hostbits">8</span> bits are free to vary from host to host
+      within the block.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Netmask</summary>
+      <p>The netmask spells the prefix out as four octets:
+      <span data-wiki="prefix">24</span> one-bits followed by zero-bits gives
+      <span data-wiki="netmask">255.255.255.0</span>. Routers AND an address with
+      the mask to recover its network — every address in this block ANDs down to
+      <span data-wiki="network">192.168.1.0</span>.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Wildcard mask</summary>
+      <p>The wildcard mask is the bitwise inverse of the netmask:
+      <span data-wiki="wildcard">0.0.0.255</span>. Cisco ACLs and OSPF use it to
+      say which bits may vary — a 0 bit must match exactly, a 1 bit is free.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Network address</summary>
+      <p>Set every host bit to 0 and you get
+      <span data-wiki="network">192.168.1.0</span> — the name of the block
+      itself. It identifies the subnet in routing tables and can't be assigned to
+      a machine (/31 and /32 networks are the exception — see Host range).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Broadcast address</summary>
+      <p>Set every host bit to 1 and you get
+      <span data-wiki="broadcast">192.168.1.255</span>. A packet sent there is
+      delivered to every host on the subnet, so it can't be assigned to a single
+      machine either (again, /31 and /32 excepted).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Host range &amp; counts</summary>
+      <p>With <span data-wiki="hostbits">8</span> host bits the block spans
+      2^<span data-wiki="hostbits">8</span> =
+      <span data-wiki="total">256</span> addresses. On ordinary networks two of
+      them — the network and broadcast addresses — are reserved, leaving
+      <span data-wiki="usable">254</span> usable hosts from
+      <span data-wiki="first">192.168.1.1</span> to
+      <span data-wiki="last">192.168.1.254</span>.</p>
+      <p>The exceptions: a /31 has no network or broadcast address — both of its
+      two addresses are used by the endpoints of a point-to-point link
+      (RFC&nbsp;3021) — and a /32 is a route to exactly one host.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Class (A–E)</summary>
+      <p>Before CIDR (1993), the leading bits of an address fixed its class and
+      therefore its size: A (<code>0…</code>, /8), B (<code>10…</code>, /16),
+      C (<code>110…</code>, /24), D (<code>1110</code>, multicast) and
+      E (<code>1111</code>, reserved). This address falls in class
+      <span data-wiki="class">C</span>. Classes are purely historical today —
+      with CIDR a network can be any size.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Designation</summary>
+      <p>IANA sets some ranges aside: the RFC&nbsp;1918 blocks (10/8, 172.16/12,
+      192.168/16) for private networks, 100.64/10 for carrier-grade NAT, 127/8
+      for loopback, 169.254/16 for link-local, the TEST-NET blocks for
+      documentation, 224/4 for multicast and 240/4 reserved. This network is
+      <span data-wiki="designation">Private (RFC 1918)</span> — anything not in
+      a special range is publicly routable.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Reading the binary view</summary>
+      <p>The bit row is the address you typed, one cell per bit. Blue cells are
+      the network portion — the first <span data-wiki="prefix">24</span> bits,
+      frozen by the mask; peach cells are the
+      <span data-wiki="hostbits">8</span> host bits that vary across the block.
+      The purple rule marks the prefix boundary. Read the row with all host bits
+      set to 0 and you get <span data-wiki="network">192.168.1.0</span>; set them
+      all to 1 and you get <span data-wiki="broadcast">192.168.1.255</span>.</p>
+    </details>
+  </section>
 </article>
 {% endblock %}
 {% block scripts %}
