@@ -69,6 +69,7 @@ class Note:
     excerpt: str = ""                                       # plain-text summary
     has_math: bool = False     # page contains $...$ / $$...$$ (loads KaTeX)
     has_mermaid: bool = False  # page contains a mermaid fence (loads mermaid)
+    updated: str = ""          # ISO timestamp of last modification (git or mtime)
 
     @property
     def description(self) -> str:

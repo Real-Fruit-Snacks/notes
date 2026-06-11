@@ -441,6 +441,8 @@ pre.highlight[data-lang]:not([data-lang=""])::before {
 .note-date { color: var(--muted); font-size: .85rem; }
 /* middot between date and reading time */
 .note-date + .reading-time::before { content: "·"; margin-right: .55rem; color: var(--ctp-overlay1); }
+.note-updated { color: var(--muted); font-size: .85rem; }
+.reading-time + .note-updated::before { content: "·"; margin-right: .55rem; color: var(--ctp-overlay1); }
 /* a touch of breathing room before the tag chips */
 .note-meta .tag-chips { margin-left: .15rem; }
 .tag-inline { color: var(--ctp-lavender); font-weight: 500; }

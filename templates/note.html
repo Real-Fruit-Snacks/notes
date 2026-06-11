@@ -8,6 +8,7 @@
   <meta property="og:title" content="{{ note.title }}">
   <meta property="og:description" content="{{ note.description }}">
   {% if site_url %}<meta property="og:url" content="{{ abs_url(note.url) }}">{% endif %}
+  {% if note.updated %}<meta property="article:modified_time" content="{{ note.updated }}">{% endif %}
   {% if note.has_math %}<link rel="stylesheet" href="{{ base_url }}assets/vendor/katex/katex.min.css">{% endif %}
 {% endblock %}
 {% block scripts %}
@@ -30,6 +31,7 @@
   <div class="note-meta">
     {% if note.date %}<span class="note-date">{{ note.date }}</span>{% endif %}
     <span class="reading-time">{{ note.reading_minutes }} min read</span>
+    {% if note.updated %}<span class="note-updated">Updated {{ note.updated[:10] }}</span>{% endif %}
     {% if note.tags %}
     <span class="tag-chips">
       {% for tag in note.tags %}

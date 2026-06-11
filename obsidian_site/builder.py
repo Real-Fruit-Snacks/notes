@@ -1,6 +1,7 @@
 """Pipeline orchestration: vault -> dist/ in one call."""
 from __future__ import annotations
 
+from .dates import annotate_updated
 from .discover import build_resolution, discover_with_warnings
 from .emit import emit
 from .graph import build_links
@@ -25,6 +26,7 @@ def build_site(config: SiteConfig) -> list[str]:
     for name, slug in RESERVED_PAGES.items():
         resolution.setdefault(name, slug)
     by_slug = {n.slug: n for n in notes}
+    annotate_updated(config.vault, notes)
 
     # 2. parse every note (records links + referenced image assets)
     parser = Parser(resolution, by_slug, base_url=config.base_url)
