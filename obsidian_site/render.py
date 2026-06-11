@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .discover import slugify
 from .models import Note, SiteConfig
 from .text import plain_text
+from .unicode_names import name_table
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -162,6 +163,7 @@ class Renderer:
         pages["graph.json"] = json.dumps(graph_data)
         pages["search.json"] = json.dumps(self._search_index(notes))
         pages["excerpts.json"] = json.dumps(self._excerpts(notes))
+        pages["unicode-names.json"] = json.dumps(name_table(), separators=(",", ":"))
         return pages
 
     def _search_index(self, notes: list[Note]) -> list[dict]:

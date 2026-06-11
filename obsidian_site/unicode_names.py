@@ -53,7 +53,11 @@ def _aliases() -> dict[int, str]:
 
 @lru_cache(maxsize=1)
 def name_table() -> dict[str, str]:
-    """Hex code point (e.g. ``"1F4A9"``) -> name, for all assigned code points."""
+    """Hex code point (e.g. ``"1F4A9"``) -> name, for all assigned code points.
+
+    The returned dict is the shared ``lru_cache`` instance — treat it as
+    read-only.
+    """
     table = {f"{cp:04X}": alias for cp, alias in _aliases().items()}
     for cp in range(sys.maxunicode + 1):
         if 0xD800 <= cp <= 0xDFFF:  # surrogates are not characters

@@ -28,3 +28,10 @@ def test_name_table_skips_surrogates_and_unassigned():
     names = name_table()
     assert "D800" not in names
     assert "0378" not in names             # unassigned in the BMP
+
+
+def test_unicode_names_json_emitted(config):
+    build_site(config)
+    data = json.loads((config.out / "unicode-names.json").read_text(encoding="utf-8"))
+    assert data["0041"] == "LATIN CAPITAL LETTER A"
+    assert "TAB" in data["0009"]
