@@ -35,6 +35,23 @@ _CODE = re.compile(r"```.*?```|`[^`\n]*`", re.DOTALL)
 _INDENTED_CODE = re.compile(r"^(?: {4}|\t).*$", re.MULTILINE)
 
 
+def _slugify_raw(text: str) -> str:
+    """Like :func:`slugify` but returns ``""`` when the text strips to nothing.
+
+    Used internally by :func:`_slugify_path_segment` so it can distinguish
+    "the segment genuinely slugifies to empty" (needs a hash fallback) from
+    "the segment legitimately slugifies to 'untitled'" (keep it as-is).
+    """
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    text = text.strip().lower()
+    text = _SLUG_SPACES.sub("-", text)
+    text = _SLUG_STRIP.sub("", text)
+    text = _SLUG_DASHES.sub("-", text)
+    text = re.sub(r"/-+", "/", text)
+    text = re.sub(r"-+/", "/", text)
+    return text.strip("-/")  # "" when nothing survived
+
+
 def slugify(text: str) -> str:
     """Turn arbitrary text into a url-safe slug, preserving ``/`` separators.
 
@@ -46,32 +63,20 @@ def slugify(text: str) -> str:
     4. Strip non-slug characters.
     5. Collapse consecutive dashes and clean up dash/slash boundaries.
     """
-    # 4a: NFKD normalisation + ASCII encoding strips accents, ligatures, etc.
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    text = text.strip().lower()
-    # 4b: replace spaces/underscores BEFORE the strip regex so they become '-'
-    # rather than being silently deleted.
-    text = _SLUG_SPACES.sub("-", text)
-    text = _SLUG_STRIP.sub("", text)
-    text = _SLUG_DASHES.sub("-", text)
-    text = re.sub(r"/-+", "/", text)
-    text = re.sub(r"-+/", "/", text)
-    return text.strip("-/") or "untitled"
+    return _slugify_raw(text) or "untitled"
 
 
 def _slugify_path_segment(segment: str) -> str:
     """Slugify one path segment with a stable fallback for fully non-Latin names.
 
-    When ``slugify()`` returns empty (e.g. '日本語' has no ASCII equivalent),
-    we fall back to ``n-<first 8 hex chars of SHA-1>`` so that two different
-    non-Latin filenames always get *distinct* and *deterministic* slugs instead
-    of both becoming 'untitled'.
-
-    Plain ``slugify()`` is unchanged for all other uses (heading anchors, tags).
-    The seam is the path-segment slug assignment in ``discover_with_warnings``.
+    Uses :func:`_slugify_raw` (returns ``""`` on empty) instead of
+    :func:`slugify` (returns ``"untitled"`` on empty) so that a note
+    literally named ``Untitled.md`` keeps the slug ``untitled``, while a
+    fully non-Latin filename (e.g. ``日本語.md``) that strips to nothing gets
+    ``n-<first 8 hex chars of SHA-1>`` — distinct and deterministic.
     """
-    slug = slugify(segment)
-    if slug == "untitled":
+    slug = _slugify_raw(segment)
+    if not slug:
         digest = hashlib.sha1(segment.encode("utf-8")).hexdigest()[:8]
         return f"n-{digest}"
     return slug

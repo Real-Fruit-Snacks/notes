@@ -107,3 +107,27 @@ def test_nonlatin_filenames_get_distinct_deterministic_slugs(vault_nonlatin, tmp
     assert len(slugs1) == 2, f"Expected 2 distinct slugs, got: {slugs1}"
     assert "untitled" not in slugs1
     assert slugs1 == slugs2, "Slugs are not stable across builds"
+
+
+def test_untitled_note_gets_slug_untitled(vault_nonlatin, tmp_path):
+    """A note literally named 'Untitled.md' must slug to 'untitled', not a hash."""
+    _write(vault_nonlatin, "Untitled.md", "---\npublish: true\n---\nhello")
+    notes = _build_notes(vault_nonlatin, tmp_path)
+    assert len(notes) == 1
+    assert notes[0].slug == "untitled"
+    assert notes[0].url == "untitled.html"
+
+
+def test_cjk_file_still_gets_hash_slug(vault_nonlatin, tmp_path):
+    """CJK filenames that strip to empty must still receive a stable n-<hash> slug."""
+    _write(vault_nonlatin, "日本語.md", "---\npublish: true\n---\nhello")
+    notes = _build_notes(vault_nonlatin, tmp_path)
+    assert len(notes) == 1
+    slug = notes[0].slug
+    assert slug.startswith("n-"), f"Expected hash slug, got: {slug}"
+    assert slug == "n-c12140a0"
+
+
+def test_slugify_nonlatin_returns_untitled():
+    """Public slugify() still returns 'untitled' for fully non-Latin text (heading/tag callers)."""
+    assert slugify("日本語") == "untitled"
