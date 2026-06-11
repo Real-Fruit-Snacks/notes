@@ -9,6 +9,8 @@
   var bitsEl = document.getElementById("subnet-bits");
   var factsEl = document.getElementById("subnet-facts");
   var outputEl = document.getElementById("subnet-output");
+  var wikiEl = document.getElementById("subnet-wiki");
+  var wikiSpans = document.querySelectorAll("[data-wiki]");
 
   // ---- math (uint32 via >>> 0) ----
   function ipToInt(o) { return ((o[0] << 24) | (o[1] << 16) | (o[2] << 8) | o[3]) >>> 0; }
@@ -129,7 +131,7 @@
     return wrap;
   }
 
-  function renderFacts(ip, n) {
+  function computeValues(ip, n) {
     var mask = maskOf(n);
     var network = (ip & mask) >>> 0;
     var broadcast = (network | ~mask) >>> 0;
@@ -152,18 +154,47 @@
       note = " (single host)";
     }
 
+    return {
+      cidr: intToIp(network) + "/" + n,
+      prefix: String(n),
+      hostbits: String(32 - n),
+      netmask: intToIp(mask),
+      wildcard: intToIp(~mask >>> 0),
+      network: intToIp(network),
+      broadcast: intToIp(broadcast),
+      first: intToIp(first),
+      last: intToIp(last),
+      usable: usable.toLocaleString(),
+      total: total.toLocaleString(),
+      "class": classOf(ip),
+      designation: designationOf(network),
+      note: note,
+    };
+  }
+
+  function renderFacts(v, n) {
     factsEl.textContent = "";
-    factsEl.appendChild(fact("CIDR", intToIp(network) + "/" + n));
-    factsEl.appendChild(fact("Netmask", intToIp(mask)));
-    factsEl.appendChild(fact("Wildcard", intToIp(~mask >>> 0)));
-    factsEl.appendChild(fact("Network", intToIp(network) + (n === 31 ? " (no network on /31)" : "")));
-    factsEl.appendChild(fact("Broadcast", intToIp(broadcast) + (n === 31 ? " (no broadcast on /31)" : "")));
-    factsEl.appendChild(fact("First usable", intToIp(first)));
-    factsEl.appendChild(fact("Last usable", intToIp(last)));
-    factsEl.appendChild(fact("Usable hosts", usable.toLocaleString() + note));
-    factsEl.appendChild(fact("Total addresses", total.toLocaleString()));
-    factsEl.appendChild(fact("Class", classOf(ip)));
-    factsEl.appendChild(fact("Designation", designationOf(network)));
+    factsEl.appendChild(fact("CIDR", v.cidr));
+    factsEl.appendChild(fact("Netmask", v.netmask));
+    factsEl.appendChild(fact("Wildcard", v.wildcard));
+    factsEl.appendChild(fact("Network", v.network + (n === 31 ? " (no network on /31)" : "")));
+    factsEl.appendChild(fact("Broadcast", v.broadcast + (n === 31 ? " (no broadcast on /31)" : "")));
+    factsEl.appendChild(fact("First usable", v.first));
+    factsEl.appendChild(fact("Last usable", v.last));
+    factsEl.appendChild(fact("Usable hosts", v.usable + v.note));
+    factsEl.appendChild(fact("Total addresses", v.total));
+    factsEl.appendChild(fact("Class", v["class"]));
+    factsEl.appendChild(fact("Designation", v.designation));
+  }
+
+  // Live worked examples: rewrite every [data-wiki] span from the same values
+  // object the facts grid renders from. The "note" key has no spans by design
+  // (the wiki's prose explains /31 and /32 in its own words).
+  function updateWiki(v) {
+    for (var i = 0; i < wikiSpans.length; i++) {
+      var key = wikiSpans[i].getAttribute("data-wiki");
+      if (v[key] !== undefined) wikiSpans[i].textContent = v[key];
+    }
   }
 
   function boundary() {
@@ -213,6 +244,7 @@
         errorEl.hidden = false;
         input.classList.add("invalid");
         outputEl.classList.add("stale");
+        if (wikiEl) wikiEl.classList.add("stale");
         return;
       }
       ip = res.ip;
@@ -222,9 +254,12 @@
     errorEl.hidden = true;
     input.classList.remove("invalid");
     outputEl.classList.remove("stale");
+    if (wikiEl) wikiEl.classList.remove("stale");
     prefixLabel.textContent = "/" + prefix;
+    var v = computeValues(ip, prefix);
     renderBits(ip, prefix);
-    renderFacts(ip, prefix);
+    renderFacts(v, prefix);
+    updateWiki(v);
   }
 
   var timer = null;
