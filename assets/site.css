@@ -557,6 +557,15 @@ hr.footnotes-sep { border: 0; height: 1px; background: var(--border); margin: 2.
 /* ---- Math (KaTeX) ----------------------------------------------------- */
 .math-block { margin: 1.2rem 0; overflow-x: auto; }
 
+/* ---- Mermaid diagrams ------------------------------------------------- */
+pre.mermaid {
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; text-align: center;
+}
+pre.mermaid:not([data-processed]) {
+  color: var(--muted); font-family: var(--font-mono); font-size: .85rem; text-align: left;
+}
+
 /* ---- Print ------------------------------------------------------------ */
 @media print {
   html[data-theme="dark"], html[data-theme="light"], :root {

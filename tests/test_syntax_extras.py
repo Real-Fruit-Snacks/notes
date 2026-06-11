@@ -43,3 +43,17 @@ def test_no_katex_on_pages_without_math(config):
     build_site(config)
     html = (config.out / "welcome.html").read_text()
     assert "katex" not in html
+
+
+# --- mermaid -------------------------------------------------------------------
+
+def test_mermaid_fence_becomes_container(tmp_path):
+    html = _build_one(tmp_path, "```mermaid\ngraph TD; A-->B;\n```")
+    assert '<pre class="mermaid">' in html
+    assert "vendor/mermaid/mermaid.min.js" in html
+
+
+def test_no_mermaid_js_on_other_pages(config):
+    build_site(config)
+    html = (config.out / "welcome.html").read_text()
+    assert "mermaid" not in html

@@ -36,6 +36,10 @@ def _highlight(code: str, lang: str, _attrs) -> str:
     Returns a string starting with ``<pre`` so markdown-it uses it verbatim
     rather than wrapping it again in its own ``<pre><code>``.
     """
+    if lang == "mermaid":
+        # A <pre> return is used verbatim by markdown-it; mermaid-init.js
+        # renders the diagram client-side from the escaped source text.
+        return f'<pre class="mermaid">{html.escape(code)}</pre>\n'
     lang_attr = f' data-lang="{html.escape(lang)}"' if lang else ""
     try:
         lexer = get_lexer_by_name(lang) if lang else guess_lexer(code)
