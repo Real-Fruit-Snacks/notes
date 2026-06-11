@@ -106,3 +106,5 @@ def test_topbar_has_tools_dropdown(config):
     assert '<details class="tools-menu"' in html
     assert 'href="/myrepo/tools/characters.html"' in html
     assert ">Character Inspector</a>" in html
+    assert 'href="/myrepo/tools/subnet.html"' in html
+    assert ">Subnet Calculator</a>" in html
