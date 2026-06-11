@@ -772,4 +772,5 @@ pre.mermaid:not([data-processed]) {
 
 /* ---------- Character MD5 panel ---------- */
 .char-hashes { margin-top: 2rem; }
+#md5-grid { grid-template-columns: 1fr; }
 #md5-grid dd { overflow-wrap: anywhere; }

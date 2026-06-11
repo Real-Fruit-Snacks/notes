@@ -135,3 +135,4 @@ def test_characters_md5_present(config):
     assert 'id="md5-grid"' in html
     assert 'id="md5-placeholder"' in html
     assert "MD5 &amp; the newline gotcha" in html
+    assert html.index('id="char-hashes"') < html.index('id="char-repr"')
