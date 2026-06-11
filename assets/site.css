@@ -769,3 +769,7 @@ pre.mermaid:not([data-processed]) {
 @media (min-width: 821px) {
   html[data-sidebar="collapsed"] .sidebar { display: none; }
 }
+
+/* ---------- Character MD5 panel ---------- */
+.char-hashes { margin-top: 2rem; }
+#md5-grid dd { overflow-wrap: anywhere; }
