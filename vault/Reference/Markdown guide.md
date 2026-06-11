@@ -78,7 +78,7 @@ Markdown tables, with column alignment:
 |:---------------|:-----------:|-------------------------:|
 | Wikilinks      | ✅ done      | aliases + headings       |
 | Callouts       | ✅ done      | see the gallery          |
-| Math           | ❌ skipped   | not needed               |
+| Math           | ✅ done      | KaTeX, see below         |
 
 ## Horizontal rule
 
@@ -94,3 +94,20 @@ An embedded image scales to the column width:
 
 Press `Ctrl`+`C` to copy. Some symbols: → ← ⌘ ¶ © — “curly quotes” and an
 em-dash—like this.
+
+## Math
+
+Inline math uses single dollar signs: $e^{i\pi}+1=0$
+
+Display math uses double dollar signs on their own lines:
+
+$$\int_0^1 x^2\,dx = \tfrac{1}{3}$$
+
+## Diagrams
+
+Mermaid diagrams are rendered client-side from fenced code blocks:
+
+```mermaid
+graph TD;
+  A[Write] --> B[Publish];
+```

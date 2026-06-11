@@ -15,7 +15,9 @@ Only notes carrying the **`publish` tag** (in frontmatter `tags:` or as an inlin
   (heading links jump to real anchors), image embeds `![[img.png]]`, note transclusions
   `![[note]]`, inline `#tags` + frontmatter tags, callouts (`> [!note]`, `> [!warning]`, …),
   footnotes (`[^1]`), TeX math (`$…$` / `$$…$$`, KaTeX), and ` ```mermaid ` diagrams —
-  all self-hosted and lazy-loaded only on pages that use them.
+  all self-hosted and lazy-loaded only on pages that use them. Raw HTML in note bodies
+  is emitted as-is for Obsidian parity — only publish content you trust, since pasted
+  HTML/scripts go live on the site.
 - **Syntax-highlighted code** via Pygments — each block shows its **language** and a **copy button**.
 - **Backlinks** on every note, an interactive **graph view** at `/graph`, and a
   collapsible **local graph** on each note (lazy-loads d3 only when opened).
