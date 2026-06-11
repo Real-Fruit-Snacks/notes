@@ -97,7 +97,9 @@
       <code>%</code> plus two hex digits (💩 → <code>%F0%9F%92%A9</code>).
       Unreserved ASCII — letters, digits, <code>-</code> <code>_</code>
       <code>.</code> <code>~</code> — passes through untouched, which is why
-      <code>h</code> stays <code>h</code>.</p>
+      <code>h</code> stays <code>h</code>. (This table uses the browser's
+      <code>encodeURIComponent</code>, which also leaves <code>!</code>
+      <code>'</code> <code>(</code> <code>)</code> <code>*</code> alone.)</p>
     </details>
   </section>
 </article>
