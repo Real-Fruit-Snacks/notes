@@ -46,11 +46,12 @@ def heading_anchors(state) -> None:
         text = clean_text(tokens[i + 1].content)
         base = prefix + (slugify(text) or "section")
         hid = base
-        if hid in seen:
-            seen[hid] += 1
-            hid = f"{base}-{seen[hid]}"
-        else:
-            seen[hid] = 1
+        n = seen.get(base, 0)
+        while hid in seen:
+            n += 1
+            hid = f"{base}-{n}"
+        seen[base] = n
+        seen[hid] = 0
         tok.attrSet("id", hid)
         if top:
             env["result"].headings.append(

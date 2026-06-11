@@ -41,7 +41,8 @@ def test_repeated_transclusion_heading_ids_unique(vault, tmp_path):
     config, _ = build(vault, tmp_path)
     html = (config.out / "host.html").read_text()
     assert html.count('id="inner-section"') == 1
-    assert 'id="inner-section-2"' in html
+    # The dedup algorithm appends -1, -2, ... (first duplicate becomes -1).
+    assert 'id="inner-section-1"' in html
 
 
 def test_malformed_frontmatter_skipped_with_warning(vault, tmp_path):
@@ -115,3 +116,22 @@ def test_title_only_callout_has_no_empty_paragraph(vault, tmp_path):
     html = (config.out / "a.html").read_text()
     assert 'callout-title">Just a title</div>' in html
     assert "<p></p>" not in html
+
+
+def test_heading_dedup_no_collision_with_suffixed_heading(vault, tmp_path):
+    """## Intro / ## Intro / ## Intro 2 must yield three distinct ids.
+
+    The old algorithm produced intro, intro-2, intro-2 (collision) because it
+    never checked whether the suffixed id itself was already taken.
+    """
+    write_note(vault, "a.md", "## Intro\n\n## Intro\n\n## Intro 2\n")
+    config, _ = build(vault, tmp_path)
+    html = (config.out / "a.html").read_text()
+    # Collect all heading ids from the rendered output.
+    import re
+    ids = re.findall(r'id="([^"]+)"', html)
+    heading_ids = [i for i in ids if i.startswith("intro")]
+    assert len(heading_ids) == len(set(heading_ids)), (
+        f"Duplicate heading ids found: {heading_ids}"
+    )
+    assert len(heading_ids) == 3
