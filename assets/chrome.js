@@ -53,4 +53,18 @@
       applyTheme(next);
     });
   }
+  // Tools dropdown (native <details>): close on outside click or Escape.
+  var tools = document.getElementById("tools-menu");
+  if (tools) {
+    document.addEventListener("click", function (e) {
+      if (tools.open && !tools.contains(e.target)) tools.open = false;
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && tools.open) {
+        tools.open = false;
+        var s = tools.querySelector("summary");
+        if (s) s.focus();
+      }
+    });
+  }
 })();

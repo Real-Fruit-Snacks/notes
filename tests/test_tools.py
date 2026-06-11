@@ -58,7 +58,7 @@ def test_characters_wikilink_resolves(tmp_path):
     warnings = build_site(config)
 
     html = (config.out / "home.html").read_text(encoding="utf-8")
-    assert html.count('href="/tools/characters.html"') == 2
+    assert html.count('href="/tools/characters.html"') == 3  # 2 wikilinks + 1 topnav dropdown
     assert '<span class="broken-link"' not in html
     assert not any("Characters" in w for w in warnings)
 
@@ -71,3 +71,12 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     build_site(config)
     sitemap = (config.out / "sitemap.xml").read_text(encoding="utf-8")
     assert "https://example.com/myrepo/tools/characters.html" in sitemap
+    assert "https://example.com/myrepo/graph.html" in sitemap
+
+
+def test_topbar_has_tools_dropdown(config):
+    build_site(config)
+    html = (config.out / "index.html").read_text(encoding="utf-8")
+    assert '<details class="tools-menu"' in html
+    assert 'href="/myrepo/tools/characters.html"' in html
+    assert ">Character Inspector</a>" in html
