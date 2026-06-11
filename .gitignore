@@ -11,6 +11,9 @@ __pycache__/
 .DS_Store
 .obsidian/
 
-# Local tooling state
+# Local tooling state (never published)
 .omc/
 .claude/
+.superpowers/
+CLAUDE.md
+docs/superpowers/
