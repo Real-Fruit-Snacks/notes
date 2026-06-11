@@ -202,6 +202,8 @@
 
   function recompute(fromSlider) {
     if (fromSlider) {
+      // Deliberately uses the last VALID ip (never re-parses possibly-dirty
+      // input text); the slider handler cancels the pending debounce first.
       prefix = Number(slider.value);
       input.value = intToIp(ip) + "/" + prefix;
     } else {
