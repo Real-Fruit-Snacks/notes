@@ -33,8 +33,8 @@ def _font(size: int, bold: bool):
     font = ImageFont.truetype(str(FONT_PATH), size)
     try:
         font.set_variation_by_name("Bold" if bold else "Regular")
-    except (OSError, Exception):
-        pass  # static font or no variation support — default weight is fine
+    except OSError:
+        pass  # static font or no named variations — default weight is fine
     return font
 
 
