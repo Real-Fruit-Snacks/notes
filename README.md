@@ -10,20 +10,25 @@ Only notes carrying the **`publish` tag** (in frontmatter `tags:` or as an inlin
 
 - **Docs-style layout** — top bar with search, left folder-nav tree (with a mobile
   hamburger drawer), centered reading column, a per-note **table of contents**, and
-  inline "linked mentions" (backlinks). Dark-only **Catppuccin Mocha** theme.
+  inline "linked mentions" (backlinks). **Light/dark theme toggle** (Catppuccin Mocha/Latte), following the visitor's OS preference.
 - **Obsidian syntax:** wikilinks `[[note]]` / `[[note|alias]]` / `[[note#heading]]`
   (heading links jump to real anchors), image embeds `![[img.png]]`, note transclusions
-  `![[note]]`, inline `#tags` + frontmatter tags, and callouts (`> [!note]`, `> [!warning]`, …).
+  `![[note]]`, inline `#tags` + frontmatter tags, callouts (`> [!note]`, `> [!warning]`, …),
+  footnotes (`[^1]`), TeX math (`$…$` / `$$…$$`, KaTeX), and ` ```mermaid ` diagrams —
+  all self-hosted and lazy-loaded only on pages that use them.
 - **Syntax-highlighted code** via Pygments — each block shows its **language** and a **copy button**.
 - **Backlinks** on every note, an interactive **graph view** at `/graph`, and a
   collapsible **local graph** on each note (lazy-loads d3 only when opened).
 - **Hover previews** — hovering an internal link shows a card with the target's excerpt.
 - **Client-side full-text search** (MiniSearch, press `/` to focus) — no server needed.
 - **Polished reading UI:** self-hosted **Inter + JetBrains Mono** (variable woff2, no CDN),
-  styled tables/blockquotes, **reading time**, **prev/next** navigation, heading hover-anchors,
+  styled tables/blockquotes, **reading time**, per-note **last updated** dates (from git
+  history, file-mtime fallback), **prev/next** navigation, heading hover-anchors,
   back-to-top, focus-visible rings, a skip link, and `prefers-reduced-motion` support.
-- **Sharing & SEO:** per-note `<meta description>` + Open Graph tags, `sitemap.xml`,
-  an RSS `feed.xml`, and a `404.html`.
+- **Sharing & SEO:** per-note `<meta description>` + Open Graph tags, auto-generated
+  **og:image** social cards (optional Pillow), `robots.txt` + canonical URLs, favicon +
+  web manifest, a print stylesheet, `sitemap.xml`, an RSS `feed.xml`, a `404.html`, and
+  a **Recently updated** section on the homepage.
 - **Broken links** to unpublished/missing notes are styled and reported as build warnings.
 
 ## Quick start
