@@ -8,6 +8,8 @@
   <meta property="og:title" content="{{ note.title }}">
   <meta property="og:description" content="{{ note.description }}">
   {% if site_url %}<meta property="og:url" content="{{ abs_url(note.url) }}">{% endif %}
+  {% if site_url and cards_enabled %}<meta property="og:image" content="{{ abs_url('og/' + note.slug + '.png') }}">
+  <meta name="twitter:card" content="summary_large_image">{% endif %}
   {% if note.updated %}<meta property="article:modified_time" content="{{ note.updated }}">{% endif %}
   {% if note.has_math %}<link rel="stylesheet" href="{{ base_url }}assets/vendor/katex/katex.min.css">{% endif %}
 {% endblock %}

@@ -73,7 +73,7 @@ def collect_tags(notes: list[Note]) -> dict[str, list[Note]]:
 
 
 class Renderer:
-    def __init__(self, config: SiteConfig):
+    def __init__(self, config: SiteConfig, cards_enabled: bool = False):
         self.config = config
         self.env = Environment(
             loader=FileSystemLoader(str(TEMPLATE_DIR)),
@@ -83,6 +83,7 @@ class Renderer:
         self.env.globals["site_title"] = config.site_title
         self.env.globals["site_url"] = config.site_url
         self.env.globals["abs_url"] = config.abs_url
+        self.env.globals["cards_enabled"] = cards_enabled
         self.env.filters["slugify"] = slugify
 
     def _url(self, path: str) -> str:

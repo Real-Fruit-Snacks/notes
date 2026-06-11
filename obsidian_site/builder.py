@@ -1,6 +1,7 @@
 """Pipeline orchestration: vault -> dist/ in one call."""
 from __future__ import annotations
 
+from . import cards
 from .dates import annotate_updated
 from .discover import build_resolution, discover_with_warnings
 from .emit import emit
@@ -54,8 +55,11 @@ def build_site(config: SiteConfig) -> list[str]:
     graph_data = build_links(notes)
 
     # 4. render pages
-    pages = Renderer(config).render_site(notes, graph_data)
+    cards_enabled = bool(config.site_url) and cards.available()
+    pages = Renderer(config, cards_enabled=cards_enabled).render_site(notes, graph_data)
 
-    # 5. emit to disk
+    # 5. emit to disk (+ social cards, written after emit clears the out dir)
     warnings += emit(config, pages, image_assets)
+    if config.site_url:
+        warnings += cards.generate_cards(config, notes)
     return warnings

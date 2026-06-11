@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="{{ base_url }}assets/site.css">
   <link rel="stylesheet" href="{{ base_url }}assets/pygments.css">
   <link rel="icon" type="image/svg+xml" href="{{ base_url }}assets/favicon.svg">
+  {% if cards_enabled %}<link rel="apple-touch-icon" href="{{ base_url }}apple-touch-icon.png">{% endif %}
   <link rel="manifest" href="{{ base_url }}site.webmanifest">
   <link rel="alternate" type="application/rss+xml" title="{{ site_title }}" href="{{ base_url }}feed.xml">
   {% if site_url and canonical_path is defined and canonical_path %}<link rel="canonical" href="{{ abs_url(canonical_path) }}">{% endif %}
