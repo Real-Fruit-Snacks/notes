@@ -101,7 +101,7 @@
 
   // Row order must match the wiki entries in templates/tools/characters.html.
   var REPR_ROWS = [
-    { label: "Character", classed: true,
+    { label: "Character",
       value: function (c) { return labelFor(c.cls, c.ch, c.cp); } },
     { label: "Code point", value: function (c) { return "U+" + hex(c.cp); } },
     { label: "Decimal", value: function (c) { return String(c.cp); } },
@@ -119,7 +119,9 @@
 
   function renderRepr() {
     if (!reprTable) return;
+    var thead = reprTable.tHead;
     var tbody = reprTable.tBodies[0];
+    thead.textContent = "";
     tbody.textContent = "";
     if (!chars.length) {
       reprWrap.hidden = true;
@@ -130,25 +132,32 @@
     reprWrap.hidden = false;
     reprPlaceholder.hidden = true;
 
+    var headRow = document.createElement("tr");
+    for (var r = 0; r < REPR_ROWS.length; r++) {
+      var th = document.createElement("th");
+      th.setAttribute("scope", "col");
+      th.textContent = REPR_ROWS[r].label;
+      headRow.appendChild(th);
+    }
+    thead.appendChild(headRow);
+
     var count = Math.min(chars.length, REPR_MAX);
-    var cols = [];
     for (var i = 0; i < count; i++) {
       var ch = chars[i];
       var cp = ch.codePointAt(0);
-      cols.push({ ch: ch, cp: cp, cls: classify(ch, cp) });
-    }
-    for (var r = 0; r < REPR_ROWS.length; r++) {
-      var row = REPR_ROWS[r];
+      var c = { ch: ch, cp: cp, cls: classify(ch, cp) };
       var tr = document.createElement("tr");
-      var th = document.createElement("th");
-      th.setAttribute("scope", "row");
-      th.textContent = row.label;
-      tr.appendChild(th);
-      for (var j = 0; j < cols.length; j++) {
-        var td = document.createElement("td");
-        if (row.classed) td.className = "chip-" + cols[j].cls;
-        td.textContent = row.value(cols[j]);
-        tr.appendChild(td);
+      for (var k = 0; k < REPR_ROWS.length; k++) {
+        var cell;
+        if (k === 0) {
+          cell = document.createElement("th");
+          cell.setAttribute("scope", "row");
+          cell.className = "chip-" + c.cls;
+        } else {
+          cell = document.createElement("td");
+        }
+        cell.textContent = REPR_ROWS[k].value(c);
+        tr.appendChild(cell);
       }
       tbody.appendChild(tr);
     }
