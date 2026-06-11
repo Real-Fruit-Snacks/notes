@@ -26,6 +26,11 @@ _PUBLISH_INLINE = re.compile(r"(?<![\w/#])#publish(?![\w/-])", re.IGNORECASE)
 # Fenced blocks and inline code, stripped before the inline scan so a note
 # *documenting* the #publish marker is not itself published.
 _CODE = re.compile(r"```.*?```|`[^`\n]*`", re.DOTALL)
+# 4-space or tab indented code blocks (CommonMark indented code).
+# Note: lines that are part of a list item and happen to be indented 4+ spaces
+# could be false negatives here, but for a publish *gate* under-publishing is
+# safer than over-publishing, so we accept that trade-off.
+_INDENTED_CODE = re.compile(r"^(?: {4}|\t).*$", re.MULTILINE)
 
 
 def slugify(text: str) -> str:
@@ -73,7 +78,8 @@ def is_published(post: frontmatter.Post) -> bool:
         return True
     if any(t.lower() == PUBLISH_TAG for t in _normalise_tags(post.get("tags"))):
         return True
-    return bool(_PUBLISH_INLINE.search(_CODE.sub("", post.content)))
+    body = _INDENTED_CODE.sub("", _CODE.sub("", post.content))
+    return bool(_PUBLISH_INLINE.search(body))
 
 
 def discover(config: SiteConfig) -> tuple[list[Note], dict[str, str]]:

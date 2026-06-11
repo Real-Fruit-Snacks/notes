@@ -104,3 +104,24 @@ def test_publish_false_string_does_not_veto(vault, tmp_path):
     write(vault, "a.md", "---\npublish: 'false'\ntags: [publish]\n---\nhello")
     out = build(vault, tmp_path)
     assert (out / "a.html").exists()
+
+
+def test_indented_code_block_does_not_publish(vault, tmp_path):
+    """#publish inside a 4-space indented code block must NOT trigger publication."""
+    write(vault, "a.md", "Some note\n\n    #publish in an indented code block\n")
+    out = build(vault, tmp_path)
+    assert not (out / "a.html").exists()
+
+
+def test_tab_indented_code_block_does_not_publish(vault, tmp_path):
+    """#publish inside a tab-indented code block must NOT trigger publication."""
+    write(vault, "a.md", "Some note\n\n\t#publish in a tab-indented code block\n")
+    out = build(vault, tmp_path)
+    assert not (out / "a.html").exists()
+
+
+def test_inline_publish_in_prose_still_publishes(vault, tmp_path):
+    """Regression guard: real inline #publish in prose must still trigger publication."""
+    write(vault, "a.md", "Some note with a real #publish marker in prose.\n")
+    out = build(vault, tmp_path)
+    assert (out / "a.html").exists()
