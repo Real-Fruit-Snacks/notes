@@ -83,3 +83,24 @@ def test_publish_tag_is_invisible_in_output(vault, tmp_path):
     assert "#cooking" in html
     assert (out / "tags" / "ideas.html").exists()
     assert (out / "tags" / "cooking.html").exists()
+
+
+def test_publish_false_frontmatter_vetoes_inline_tag(vault, tmp_path):
+    """publish: false in frontmatter must override an inline #publish in body."""
+    write(vault, "a.md", "---\npublish: false\n---\nWe will set #publish later.")
+    out = build(vault, tmp_path)
+    assert not (out / "a.html").exists()
+
+
+def test_publish_false_frontmatter_vetoes_tags(vault, tmp_path):
+    """publish: false in frontmatter must override a publish tag in frontmatter tags."""
+    write(vault, "a.md", "---\npublish: false\ntags: [publish]\n---\nhello")
+    out = build(vault, tmp_path)
+    assert not (out / "a.html").exists()
+
+
+def test_publish_false_string_does_not_veto(vault, tmp_path):
+    """publish: 'false' (string, not bool) keeps current behavior — tag wins."""
+    write(vault, "a.md", "---\npublish: 'false'\ntags: [publish]\n---\nhello")
+    out = build(vault, tmp_path)
+    assert (out / "a.html").exists()

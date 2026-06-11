@@ -59,8 +59,17 @@ def is_published(post: frontmatter.Post) -> bool:
 
     The tag counts in frontmatter ``tags:`` or as an inline ``#publish`` in
     the body (outside code). Legacy ``publish: true`` frontmatter still works.
+
+    The boolean frontmatter flag is authoritative when present:
+    ``publish: false`` (real bool) vetoes all tag/inline checks so a note
+    in-progress that already has a #publish marker is never accidentally
+    published.  String values like ``publish: 'false'`` are not booleans and
+    keep the existing tag-based behaviour.
     """
-    if post.get("publish") is True:
+    flag = post.get("publish")
+    if flag is False:
+        return False
+    if flag is True:
         return True
     if any(t.lower() == PUBLISH_TAG for t in _normalise_tags(post.get("tags"))):
         return True
