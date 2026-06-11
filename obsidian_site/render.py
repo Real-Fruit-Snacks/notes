@@ -117,6 +117,7 @@ class Renderer:
         index_tpl = self.env.get_template("index.html")
         pages["index.html"] = index_tpl.render(
             notes=sorted(notes, key=lambda n: n.title.lower()), nav=nav, all_tags=sorted(tags),
+            recent=sorted(notes, key=lambda n: n.updated, reverse=True)[:8],
         )
 
         graph_tpl = self.env.get_template("graph.html")

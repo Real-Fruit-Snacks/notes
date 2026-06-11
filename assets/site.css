@@ -568,6 +568,11 @@ pre.mermaid:not([data-processed]) {
   color: var(--muted); font-family: var(--font-mono); font-size: .85rem; text-align: left;
 }
 
+/* ---- Homepage sections ------------------------------------------------ */
+.index-heading { font-size: 1.15rem; color: var(--ctp-sapphire); margin: 1.6rem 0 .4rem; }
+.recent-list li { display: flex; justify-content: space-between; gap: 1rem; }
+.recent-list .note-date { flex: none; }
+
 /* ---- Print ------------------------------------------------------------ */
 @media print {
   html[data-theme="dark"], html[data-theme="light"], :root {

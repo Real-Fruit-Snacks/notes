@@ -14,6 +14,19 @@
   </div>
   {% endif %}
 
+  {% if recent %}
+  <h2 class="index-heading">Recently updated</h2>
+  <ul class="note-list recent-list">
+    {% for n in recent %}
+    <li>
+      <a href="{{ base_url }}{{ n.url }}">{{ n.title }}</a>
+      <span class="note-date">{{ n.updated[:10] }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <h2 class="index-heading">All notes</h2>
   <ul class="note-list">
     {% for n in notes %}
     <li><a href="{{ base_url }}{{ n.url }}">{{ n.title }}</a></li>

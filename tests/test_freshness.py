@@ -23,3 +23,9 @@ def test_updated_date_from_git(config):
     build_site(config)
     html = (config.out / "welcome.html").read_text()
     assert 'property="article:modified_time"' in html
+
+
+def test_homepage_lists_recently_updated(config):
+    build_site(config)
+    index = (config.out / "index.html").read_text()
+    assert "Recently updated" in index
