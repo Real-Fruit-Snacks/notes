@@ -142,11 +142,15 @@
   function add32(a, b) { return (a + b) | 0; }
   function rotl32(x, c) { return (x << c) | (x >>> (32 - c)); }
 
-  function md5Hex(bytes) {
+  function md5Hex(bytes, trailer) {
     var padded = bytes.slice();
+    if (trailer) {
+      for (var t = 0; t < trailer.length; t++) padded.push(trailer[t]);
+    }
+    var msgLen = padded.length;
     padded.push(0x80);
     while (padded.length % 64 !== 56) padded.push(0);
-    var bitLen = bytes.length * 8;
+    var bitLen = msgLen * 8;
     var lo = bitLen >>> 0;
     var hi = Math.floor(bitLen / 0x100000000);
     padded.push(lo & 255, (lo >>> 8) & 255, (lo >>> 16) & 255, (lo >>> 24) & 255);
@@ -197,8 +201,9 @@
     return wrap;
   }
 
-  function hashLabel(bytes) {
-    return md5Hex(bytes) + " · " + bytes.length.toLocaleString() + " bytes";
+  function hashLabel(bytes, trailer) {
+    var total = bytes.length + (trailer ? trailer.length : 0);
+    return md5Hex(bytes, trailer) + " · " + total.toLocaleString() + " bytes";
   }
 
   // Hashes always cover the FULL text — deliberately not subject to the
@@ -206,17 +211,17 @@
   function renderHashes() {
     if (!md5Grid) return;
     md5Grid.textContent = "";
-    if (!chars.length) {
+    var bytes = textToUtf8(input.value);
+    if (!bytes.length) {
       md5Grid.hidden = true;
       md5Placeholder.hidden = false;
       return;
     }
     md5Grid.hidden = false;
     md5Placeholder.hidden = true;
-    var bytes = textToUtf8(input.value);
     md5Grid.appendChild(factRow("MD5", hashLabel(bytes)));
-    md5Grid.appendChild(factRow("MD5 + LF", hashLabel(bytes.concat(10))));
-    md5Grid.appendChild(factRow("MD5 + CRLF", hashLabel(bytes.concat(13, 10))));
+    md5Grid.appendChild(factRow("MD5 + LF", hashLabel(bytes, [10])));
+    md5Grid.appendChild(factRow("MD5 + CRLF", hashLabel(bytes, [13, 10])));
   }
 
   // Row order must match the wiki entries in templates/tools/characters.html.
