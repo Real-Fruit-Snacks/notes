@@ -166,7 +166,7 @@
 
   function setActive(i, pin) {
     var limit = Math.min(chars.length, MAX_CHIPS);
-    if (i < 0 || i >= limit) return;
+    if (i < 0 || i >= limit) return false;
     if (pin) pinnedIndex = i;
     activeIndex = i;
     var prev = grid.querySelector(".chip.active");
@@ -177,6 +177,7 @@
       if (pin) chip.scrollIntoView({ block: "nearest" });
     }
     renderDetail();
+    return true;
   }
 
   grid.addEventListener("mouseover", function (e) {
@@ -185,21 +186,31 @@
   });
   grid.addEventListener("click", function (e) {
     var chip = e.target.closest(".chip");
-    if (chip) setActive(Number(chip.getAttribute("data-i")), true);
+    if (!chip) return;
+    var i = Number(chip.getAttribute("data-i"));
+    if (pinnedIndex === i) {
+      pinnedIndex = -1; // second click unpins; hover previews resume
+    } else {
+      setActive(i, true);
+    }
   });
   grid.addEventListener("keydown", function (e) {
+    var moved = false;
     if (e.key === "ArrowRight") {
-      setActive(activeIndex < 0 ? 0 : activeIndex + 1, true);
+      moved = setActive(activeIndex < 0 ? 0 : activeIndex + 1, true);
     } else if (e.key === "ArrowLeft") {
-      setActive(activeIndex < 0 ? 0 : activeIndex - 1, true);
+      moved = setActive(activeIndex < 0 ? 0 : activeIndex - 1, true);
     } else if (e.key === "Home") {
-      setActive(0, true);
+      moved = setActive(0, true);
     } else if (e.key === "End") {
-      setActive(Math.min(chars.length, MAX_CHIPS) - 1, true);
+      moved = setActive(Math.min(chars.length, MAX_CHIPS) - 1, true);
+    } else if (e.key === "Escape") {
+      pinnedIndex = -1; // release pin; hover previews resume
+      return;
     } else {
       return;
     }
-    e.preventDefault();
+    if (moved) e.preventDefault();
   });
 
   var timer = null;
