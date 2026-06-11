@@ -14,6 +14,8 @@
   var reprTable = document.getElementById("repr-table");
   var reprNotice = document.getElementById("repr-notice");
   var reprPlaceholder = document.getElementById("repr-placeholder");
+  var md5Grid = document.getElementById("md5-grid");
+  var md5Placeholder = document.getElementById("md5-placeholder");
   var REPR_MAX = 256;
 
   var MAX_CHIPS = 10000;
@@ -97,6 +99,124 @@
     var b = cp.toString(2);
     while (b.length < bits) b = "0" + b;
     return b.replace(/(.{8})(?=.)/g, "$1 ");
+  }
+
+  // Whole text -> flat UTF-8 byte array (reuses the verified encoder).
+  function textToUtf8(text) {
+    var arr = Array.from(text);
+    var bytes = [];
+    for (var i = 0; i < arr.length; i++) {
+      var bs = utf8Bytes(arr[i].codePointAt(0));
+      for (var j = 0; j < bs.length; j++) bytes.push(bs[j]);
+    }
+    return bytes;
+  }
+
+  // Clean-room RFC 1321 MD5 over a byte array (WebCrypto has no MD5).
+  // Verified against Node's OpenSSL MD5 in the extraction harness.
+  var MD5_K = [
+    0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
+    0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+    0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
+    0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+    0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
+    0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+    0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
+    0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+    0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
+    0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+    0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
+    0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+    0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
+    0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+    0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
+    0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391,
+  ];
+  var MD5_S = [
+    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+    5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+    4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
+  ];
+
+  function add32(a, b) { return (a + b) | 0; }
+  function rotl32(x, c) { return (x << c) | (x >>> (32 - c)); }
+
+  function md5Hex(bytes) {
+    var padded = bytes.slice();
+    padded.push(0x80);
+    while (padded.length % 64 !== 56) padded.push(0);
+    var bitLen = bytes.length * 8;
+    var lo = bitLen >>> 0;
+    var hi = Math.floor(bitLen / 0x100000000);
+    padded.push(lo & 255, (lo >>> 8) & 255, (lo >>> 16) & 255, (lo >>> 24) & 255);
+    padded.push(hi & 255, (hi >>> 8) & 255, (hi >>> 16) & 255, (hi >>> 24) & 255);
+
+    var a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+
+    for (var off = 0; off < padded.length; off += 64) {
+      var M = [];
+      for (var w = 0; w < 16; w++) {
+        M[w] = padded[off + w * 4] | (padded[off + w * 4 + 1] << 8) |
+               (padded[off + w * 4 + 2] << 16) | (padded[off + w * 4 + 3] << 24);
+      }
+      var a = a0, b = b0, c = c0, d = d0;
+      for (var i = 0; i < 64; i++) {
+        var f, g;
+        if (i < 16) { f = (b & c) | (~b & d); g = i; }
+        else if (i < 32) { f = (d & b) | (~d & c); g = (5 * i + 1) % 16; }
+        else if (i < 48) { f = b ^ c ^ d; g = (3 * i + 5) % 16; }
+        else { f = c ^ (b | ~d); g = (7 * i) % 16; }
+        f = add32(add32(add32(f, a), MD5_K[i]), M[g]);
+        a = d; d = c; c = b;
+        b = add32(b, rotl32(f, MD5_S[i]));
+      }
+      a0 = add32(a0, a); b0 = add32(b0, b); c0 = add32(c0, c); d0 = add32(d0, d);
+    }
+
+    var out = "";
+    var words = [a0, b0, c0, d0];
+    for (var wi = 0; wi < 4; wi++) {
+      for (var bi = 0; bi < 4; bi++) {
+        var v = (words[wi] >>> (bi * 8)) & 255;
+        out += (v < 16 ? "0" : "") + v.toString(16);
+      }
+    }
+    return out;
+  }
+
+  function factRow(dt, dd) {
+    var wrap = document.createElement("div");
+    wrap.className = "fact";
+    var t = document.createElement("dt");
+    t.textContent = dt;
+    var d = document.createElement("dd");
+    d.textContent = dd;
+    wrap.appendChild(t);
+    wrap.appendChild(d);
+    return wrap;
+  }
+
+  function hashLabel(bytes) {
+    return md5Hex(bytes) + " · " + bytes.length.toLocaleString() + " bytes";
+  }
+
+  // Hashes always cover the FULL text — deliberately not subject to the
+  // 10k chip cap or REPR_MAX (a truncated hash would match nothing).
+  function renderHashes() {
+    if (!md5Grid) return;
+    md5Grid.textContent = "";
+    if (!chars.length) {
+      md5Grid.hidden = true;
+      md5Placeholder.hidden = false;
+      return;
+    }
+    md5Grid.hidden = false;
+    md5Placeholder.hidden = true;
+    var bytes = textToUtf8(input.value);
+    md5Grid.appendChild(factRow("MD5", hashLabel(bytes)));
+    md5Grid.appendChild(factRow("MD5 + LF", hashLabel(bytes.concat(10))));
+    md5Grid.appendChild(factRow("MD5 + CRLF", hashLabel(bytes.concat(13, 10))));
   }
 
   // Row order must match the wiki entries in templates/tools/characters.html.
@@ -202,6 +322,7 @@
       p.textContent = "Paste text above to inspect it.";
       grid.appendChild(p);
       renderRepr();
+      renderHashes();
       return;
     }
     ensureNames();
@@ -252,6 +373,7 @@
       noticeEl.hidden = true;
     }
     renderRepr();
+    renderHashes();
   }
 
   function renderDetail() {
