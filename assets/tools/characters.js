@@ -10,6 +10,11 @@
   var noticeEl = document.getElementById("char-notice");
   var detailEl = document.getElementById("char-detail");
   var baseUrl = document.body.getAttribute("data-base-url") || "/";
+  var reprWrap = document.querySelector(".repr-wrap");
+  var reprTable = document.getElementById("repr-table");
+  var reprNotice = document.getElementById("repr-notice");
+  var reprPlaceholder = document.getElementById("repr-placeholder");
+  var REPR_MAX = 64;
 
   var MAX_CHIPS = 10000;
   var CLASS_LABELS = {
@@ -56,6 +61,107 @@
     return ch;
   }
 
+  function byteHex(n) {
+    var h = n.toString(16).toUpperCase();
+    return h.length < 2 ? "0" + h : h;
+  }
+
+  function unitHex(n) {
+    var h = n.toString(16).toUpperCase();
+    return ("000" + h).slice(-4);
+  }
+
+  // Standard UTF-8: 1-4 bytes, prefix byte + 10xxxxxx continuations.
+  function utf8Bytes(cp) {
+    if (cp <= 0x7F) return [cp];
+    if (cp <= 0x7FF) return [0xC0 | (cp >> 6), 0x80 | (cp & 63)];
+    if (cp <= 0xFFFF) {
+      return [0xE0 | (cp >> 12), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63)];
+    }
+    return [
+      0xF0 | (cp >> 18), 0x80 | ((cp >> 12) & 63),
+      0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63),
+    ];
+  }
+
+  // UTF-16 code units: ch is one whole code point (1 or 2 units).
+  function utf16Units(ch) {
+    var units = [ch.charCodeAt(0)];
+    if (ch.length > 1) units.push(ch.charCodeAt(1));
+    return units;
+  }
+
+  // Code point bits padded to whole bytes, space-grouped per byte.
+  function binaryOf(cp) {
+    var bits = cp <= 0xFF ? 8 : cp <= 0xFFFF ? 16 : 24;
+    var b = cp.toString(2);
+    while (b.length < bits) b = "0" + b;
+    return b.replace(/(.{8})(?=.)/g, "$1 ");
+  }
+
+  // Row order must match the wiki entries in templates/tools/characters.html.
+  var REPR_ROWS = [
+    { label: "Character", classed: true,
+      value: function (c) { return labelFor(c.cls, c.ch, c.cp); } },
+    { label: "Code point", value: function (c) { return "U+" + hex(c.cp); } },
+    { label: "Decimal", value: function (c) { return String(c.cp); } },
+    { label: "Hex", value: function (c) { return "0x" + hex(c.cp); } },
+    { label: "Binary", value: function (c) { return binaryOf(c.cp); } },
+    { label: "UTF-8",
+      value: function (c) { return utf8Bytes(c.cp).map(byteHex).join(" "); } },
+    { label: "UTF-16",
+      value: function (c) { return utf16Units(c.ch).map(unitHex).join(" "); } },
+    { label: "HTML entity",
+      value: function (c) { return "&#x" + hex(c.cp) + ";"; } },
+    { label: "URL-encoded",
+      value: function (c) { return encodeURIComponent(c.ch); } },
+  ];
+
+  function renderRepr() {
+    if (!reprTable) return;
+    var tbody = reprTable.tBodies[0];
+    tbody.textContent = "";
+    if (!chars.length) {
+      reprWrap.hidden = true;
+      reprPlaceholder.hidden = false;
+      reprNotice.hidden = true;
+      return;
+    }
+    reprWrap.hidden = false;
+    reprPlaceholder.hidden = true;
+
+    var count = Math.min(chars.length, REPR_MAX);
+    var cols = [];
+    for (var i = 0; i < count; i++) {
+      var ch = chars[i];
+      var cp = ch.codePointAt(0);
+      cols.push({ ch: ch, cp: cp, cls: classify(ch, cp) });
+    }
+    for (var r = 0; r < REPR_ROWS.length; r++) {
+      var row = REPR_ROWS[r];
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.setAttribute("scope", "row");
+      th.textContent = row.label;
+      tr.appendChild(th);
+      for (var j = 0; j < cols.length; j++) {
+        var td = document.createElement("td");
+        if (row.classed) td.className = "chip-" + cols[j].cls;
+        td.textContent = row.value(cols[j]);
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    if (chars.length > REPR_MAX) {
+      reprNotice.textContent =
+        "Representations for the first " + REPR_MAX + " characters.";
+      reprNotice.hidden = false;
+    } else {
+      reprNotice.hidden = true;
+    }
+  }
+
   // Lazily fetched code point -> name table; detail degrades gracefully
   // while loading or if the fetch fails.
   var names = null;
@@ -86,6 +192,7 @@
       p.className = "char-placeholder muted";
       p.textContent = "Paste text above to inspect it.";
       grid.appendChild(p);
+      renderRepr();
       return;
     }
     ensureNames();
@@ -135,6 +242,7 @@
     } else {
       noticeEl.hidden = true;
     }
+    renderRepr();
   }
 
   function renderDetail() {
