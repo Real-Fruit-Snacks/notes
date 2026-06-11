@@ -14,7 +14,7 @@
   var reprTable = document.getElementById("repr-table");
   var reprNotice = document.getElementById("repr-notice");
   var reprPlaceholder = document.getElementById("repr-placeholder");
-  var REPR_MAX = 64;
+  var REPR_MAX = 256;
 
   var MAX_CHIPS = 10000;
   var CLASS_LABELS = {

@@ -732,24 +732,25 @@ pre.mermaid:not([data-processed]) {
 .tool-wiki { margin-top: 2rem; }
 .char-repr { margin-top: 2rem; }
 .repr-wrap {
-  overflow: auto; max-height: 26rem; background: var(--bg-alt);
+  overflow: auto; max-height: 70vh; background: var(--bg-alt);
   border: 1px solid var(--border); border-radius: var(--radius);
 }
 .repr-table { border-collapse: collapse; font-family: var(--font-mono); font-size: .85rem; }
 .repr-table thead th {
   position: sticky; top: 0; background: var(--bg-alt); color: var(--muted);
-  text-align: left; font-weight: 600; padding: .35rem .6rem;
+  text-align: center; font-weight: 600; padding: .35rem .6rem;
   border-bottom: 1px solid var(--border); white-space: nowrap; z-index: 2;
 }
 .repr-table thead th:first-child { left: 0; z-index: 3; }
 .repr-table tbody th {
   position: sticky; left: 0; background: var(--bg-alt);
-  text-align: left; font-weight: 600; padding: .35rem .6rem;
+  text-align: center; font-weight: 600; padding: .35rem .6rem;
   border-bottom: 1px solid var(--border); white-space: nowrap; z-index: 1;
 }
 .repr-table td {
   padding: .35rem .6rem; border-bottom: 1px solid var(--border);
   border-left: 1px solid var(--border); white-space: nowrap; color: var(--text);
+  text-align: center;
 }
 .repr-table tr:last-child th, .repr-table tr:last-child td { border-bottom: 0; }
 .repr-table tbody th[class*="chip-"] {
