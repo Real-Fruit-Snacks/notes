@@ -667,3 +667,45 @@ pre.mermaid:not([data-processed]) {
 .char-detail .char-meta { font-size: .9rem; color: var(--muted); }
 .char-detail .char-meta code { font-family: var(--font-mono); color: var(--text); }
 .char-placeholder { margin: auto; }
+
+/* ---------- Subnet calculator ---------- */
+.subnet-input-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.subnet-input {
+  flex: 1 1 14rem; font-family: var(--font-mono); font-size: .95rem;
+  background: var(--code-bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: .55rem .75rem;
+}
+.subnet-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.subnet-input.invalid { border-color: var(--ctp-red); }
+.subnet-input.invalid:focus-visible { outline-color: var(--ctp-red); }
+.subnet-prefix { flex: 1 1 10rem; accent-color: var(--accent); }
+.subnet-prefix-label { font-family: var(--font-mono); color: var(--muted); min-width: 2.5rem; }
+.subnet-error { color: var(--ctp-red); font-size: .9rem; }
+.subnet-bits {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+  font-family: var(--font-mono); margin: 1rem 0 .25rem;
+}
+.bit {
+  border: 1px solid; border-radius: 4px; min-width: 1.4em;
+  text-align: center; padding: .05rem 0; font-size: .9rem;
+}
+.bit-net { border-color: var(--ctp-blue); color: var(--ctp-blue); }
+.bit-host { border-color: var(--ctp-peach); color: var(--ctp-peach); }
+.bit-dot { color: var(--muted); margin: 0 .15rem; }
+.bit-boundary { width: 2px; align-self: stretch; background: var(--ctp-mauve); border-radius: 1px; }
+.subnet-legend { font-size: .85rem; }
+.subnet-legend .legend-net { color: var(--ctp-blue); }
+.subnet-legend .legend-host { color: var(--ctp-peach); }
+.subnet-facts {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: .5rem .9rem; margin: 1rem 0 0;
+}
+.subnet-facts .fact {
+  display: flex; justify-content: space-between; gap: .75rem;
+  padding: .45rem .65rem; background: var(--bg-alt);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.subnet-facts dt { color: var(--muted); }
+.subnet-facts dd { margin: 0; font-family: var(--font-mono); text-align: right; }
+#subnet-output.stale { opacity: .45; transition: opacity .15s ease; }
