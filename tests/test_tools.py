@@ -73,6 +73,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/tools/characters.html" in sitemap
     assert "https://example.com/myrepo/graph.html" in sitemap
     assert "https://example.com/myrepo/tools/subnet.html" in sitemap
+    assert "https://example.com/myrepo/tools/certs.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -108,6 +109,8 @@ def test_topbar_has_tools_dropdown(config):
     assert ">Character Inspector</a>" in html
     assert 'href="/myrepo/tools/subnet.html"' in html
     assert ">Subnet Calculator</a>" in html
+    assert 'href="/myrepo/tools/certs.html"' in html
+    assert ">Certificate Checker</a>" in html
 
 
 def test_subnet_wiki_present(config):
@@ -136,3 +139,30 @@ def test_characters_md5_present(config):
     assert 'id="md5-placeholder"' in html
     assert "MD5 &amp; the newline gotcha" in html
     assert html.index('id="char-hashes"') < html.index('id="char-repr"')
+
+
+def test_certs_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "certs.html").read_text(encoding="utf-8")
+    assert 'id="cert-input"' in html
+    assert 'id="cert-results"' in html
+    assert 'id="cert-wiki"' in html
+    assert "/myrepo/assets/tools/certs.js" in html
+    assert html.count('class="wiki-entry"') == 6
+
+
+def test_certs_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Certificate Checker]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/certs.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Certificate" in w for w in warnings)

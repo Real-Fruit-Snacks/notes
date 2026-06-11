@@ -144,6 +144,9 @@ class Renderer:
         subnet_tpl = self.env.get_template("tools/subnet.html")
         pages["tools/subnet.html"] = subnet_tpl.render(nav=nav)
 
+        certs_tpl = self.env.get_template("tools/certs.html")
+        pages["tools/certs.html"] = certs_tpl.render(nav=nav)
+
         pages["404.html"] = self.env.get_template("404.html").render(nav=nav)
 
         pages["site.webmanifest"] = json.dumps({
@@ -200,6 +203,7 @@ class Renderer:
             self.config.abs_url("graph.html"),
             self.config.abs_url("tools/characters.html"),
             self.config.abs_url("tools/subnet.html"),
+            self.config.abs_url("tools/certs.html"),
         ]
         urls += [self.config.abs_url(f"tags/{slugify(t)}.html") for t in tags]
         urls = [u for u in urls if u]  # only when site_url is configured

@@ -17,6 +17,7 @@ RESERVED_PAGES = {
     "characters": "tools/characters",
     "character inspector": "tools/characters",
     "subnet calculator": "tools/subnet",
+    "certificate checker": "tools/certs",
 }
 
 

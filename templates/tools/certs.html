@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/certs.html" %}
+{% block title %}Certificate Checker · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Certificate Checker</h1>
+  <p class="muted">Paste a PEM certificate, a chain, or a whole
+  <code>.ovpn</code> config — every certificate found is checked for expiry.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <textarea id="cert-input" class="char-input" rows="10"
+    placeholder="Paste a PEM certificate or .ovpn config…"
+    autocomplete="off" autocapitalize="off" spellcheck="false"
+    aria-label="Certificate or config to inspect"></textarea>
+  <p class="muted cert-privacy">Runs entirely in your browser — nothing you
+  paste is uploaded anywhere. Private-key blocks are ignored and never
+  displayed.</p>
+  <p id="cert-error" class="subnet-error" hidden></p>
+  <p id="cert-ignored" class="char-notice" hidden aria-live="polite"></p>
+  <div id="cert-results" class="cert-results" aria-live="polite"></div>
+  <p id="cert-placeholder" class="char-placeholder muted">Paste a certificate above to check it.</p>
+  <section class="tool-wiki" id="cert-wiki">
+    <h2>Understanding certificates</h2>
+    <details class="wiki-entry">
+      <summary>PEM &amp; DER</summary>
+      <p>A PEM file is base64 armor: the <code>BEGIN</code>/<code>END</code>
+      lines wrap a base64 payload, and the bytes inside are DER — a compact
+      binary encoding of the certificate's fields. This page decodes the armor
+      and walks the binary directly.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>What's in a certificate</summary>
+      <p>The signed part — the "to-be-signed" block — carries a serial number,
+      the issuer's name, a validity window, the subject's name and the
+      subject's public key. This tool reads exactly the fields it shows and
+      skips the rest (extensions, signatures).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The validity window</summary>
+      <p><code>notBefore</code> and <code>notAfter</code> bound when the
+      certificate may be trusted. RFC&nbsp;5280 stores years up to 2049 as two
+      digits (UTCTime) and 2050 onward as four (GeneralizedTime) — a quirk
+      this parser handles. Verdicts compare against your computer's clock.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Why the CA's expiry matters too</summary>
+      <p>Clients validate the whole chain: your client certificate
+      <strong>and</strong> the CA that signed it must both be inside their
+      validity windows. Long-lived OpenVPN setups often fail years later
+      because the CA — not the client cert — expired. Check both cards.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Self-signed vs CA-issued</summary>
+      <p>When a certificate's subject and issuer are identical, it signed
+      itself — typical for a root CA. In an <code>.ovpn</code> file the
+      <code>&lt;ca&gt;</code> block is usually self-signed and the
+      <code>&lt;cert&gt;</code> block is issued by it; the self-signed tag
+      tells them apart at a glance.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Private keys &amp; this page</summary>
+      <p>Private-key and tls-auth blocks have no expiry date, so this tool
+      ignores them — it never parses, stores or displays them. Nothing you
+      paste is uploaded anywhere: the page makes zero network requests, which
+      you can confirm in your browser's DevTools Network tab.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/certs.js"></script>
+{% endblock %}
