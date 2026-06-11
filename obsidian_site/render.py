@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import posixpath
+from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -117,7 +118,7 @@ class Renderer:
         index_tpl = self.env.get_template("index.html")
         pages["index.html"] = index_tpl.render(
             notes=sorted(notes, key=lambda n: n.title.lower()), nav=nav, all_tags=sorted(tags),
-            recent=sorted(notes, key=lambda n: n.updated, reverse=True)[:8],
+            recent=sorted(notes, key=lambda n: datetime.fromisoformat(n.updated), reverse=True)[:8],
         )
 
         graph_tpl = self.env.get_template("graph.html")
