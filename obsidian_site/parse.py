@@ -67,7 +67,7 @@ class Parser:
             .enable(["table", "strikethrough"])
             .use(tasklists_plugin)
             .use(footnote_plugin)
-            .use(dollarmath_plugin, allow_labels=False)
+            .use(dollarmath_plugin, allow_labels=False, allow_digits=False)
             .use(wikilink_plugin)
             .use(hashtag_plugin)
             .use(heading_plugin)

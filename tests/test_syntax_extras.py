@@ -34,6 +34,11 @@ def test_inline_and_block_math_render(tmp_path):
     assert "vendor/katex/katex.min.js" in html       # lazy include present
 
 
+def test_dollar_amounts_are_not_math(tmp_path):
+    html = _build_one(tmp_path, "I paid $5 and $10 for items.")
+    assert 'class="math' not in html
+
+
 def test_no_katex_on_pages_without_math(config):
     build_site(config)
     html = (config.out / "welcome.html").read_text()
