@@ -19,6 +19,86 @@
        aria-label="Inspected characters (arrow keys to move between them)">
     <p class="char-placeholder muted">Paste text above to inspect it.</p>
   </div>
+  <section class="char-repr" id="char-repr">
+    <h2>Representations</h2>
+    <p id="repr-notice" class="char-notice" hidden></p>
+    <div class="repr-wrap" hidden>
+      <table id="repr-table" class="repr-table" aria-label="Character representations">
+        <tbody></tbody>
+      </table>
+    </div>
+    <p id="repr-placeholder" class="char-placeholder muted">Paste text above to see its representations.</p>
+  </section>
+  <section class="tool-wiki" id="char-wiki">
+    <h2>Understanding the representations</h2>
+    <details class="wiki-entry">
+      <summary>Character</summary>
+      <p>The glyph itself — or, for characters with no visible shape, the short
+      label the chips above use (<code>SP</code>, <code>TAB</code>,
+      <code>ZWSP</code>, <code>NBSP</code>…). The cell is colored with the same
+      class as its chip.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Code point</summary>
+      <p>Unicode gives every character one number — its code point — written
+      <code>U+</code> plus at least four hex digits: <code>H</code> is
+      <code>U+0048</code>, 💩 is <code>U+1F4A9</code>. Every other row in this
+      table is derived from that single number.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Decimal</summary>
+      <p>The code point in base 10 — <code>H</code> is <code>72</code>. This is
+      what JavaScript's <code>codePointAt()</code> returns, and the form used by
+      decimal HTML entities like <code>&amp;#8203;</code>.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Hex</summary>
+      <p>The same number in base 16 — <code>H</code> is <code>0x48</code>. Hex
+      is the convention throughout Unicode because each hex digit is exactly
+      four bits: byte boundaries stay visible at a glance.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Binary</summary>
+      <p>The raw bits of the code point, padded to whole bytes (8 digits up to
+      <code>U+00FF</code>, 16 through the rest of the Basic Multilingual Plane,
+      24 above). These are the bits the encodings below repackage.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>UTF-8</summary>
+      <p>How the character actually travels over the wire almost everywhere.
+      ASCII stays a single identical byte (<code>0xxxxxxx</code>). Larger code
+      points use 2–4 bytes: a prefix byte announcing the length
+      (<code>110xxxxx</code>, <code>1110xxxx</code> or <code>11110xxx</code>)
+      followed by <code>10xxxxxx</code> continuation bytes, with the code
+      point's bits packed into the <code>x</code> positions — <code>é</code>
+      becomes <code>C3 A9</code>, 💩 becomes <code>F0 9F 92 A9</code>.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>UTF-16</summary>
+      <p>What JavaScript (and Windows, and Java) strings are made of. Code
+      points up to <code>U+FFFF</code> are one 16-bit unit. Above that, the
+      code point minus <code>0x10000</code> is split across a surrogate pair —
+      <code>D800</code> plus the high ten bits, <code>DC00</code> plus the low
+      ten — so 💩 is <code>D83D DCA9</code>, and <code>"💩".length</code> is 2
+      in JavaScript.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>HTML entity</summary>
+      <p>The numeric character reference <code>&amp;#x…;</code> inserts any
+      character into HTML regardless of the page's encoding. A few characters
+      also have memorable named entities — <code>&amp;amp;</code>,
+      <code>&amp;lt;</code>, <code>&amp;nbsp;</code> — but the numeric form
+      works for all of them.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>URL-encoded</summary>
+      <p>How the character is written inside a URL: each UTF-8 byte becomes
+      <code>%</code> plus two hex digits (💩 → <code>%F0%9F%92%A9</code>).
+      Unreserved ASCII — letters, digits, <code>-</code> <code>_</code>
+      <code>.</code> <code>~</code> — passes through untouched, which is why
+      <code>h</code> stays <code>h</code>.</p>
+    </details>
+  </section>
 </article>
 {% endblock %}
 {% block scripts %}

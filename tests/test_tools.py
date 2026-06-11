@@ -117,3 +117,12 @@ def test_subnet_wiki_present(config):
     assert html.count('class="wiki-entry"') == 9
     assert '<span data-wiki="broadcast">192.168.1.255</span>' in html
     assert '<span data-wiki="netmask">255.255.255.0</span>' in html
+
+
+def test_characters_repr_and_wiki_present(config):
+    build_site(config)
+    html = (config.out / "tools" / "characters.html").read_text(encoding="utf-8")
+    assert 'id="char-repr"' in html
+    assert 'id="repr-table"' in html
+    assert 'id="char-wiki"' in html
+    assert html.count('class="wiki-entry"') == 9
