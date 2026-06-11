@@ -727,3 +727,30 @@ pre.mermaid:not([data-processed]) {
 .wiki-entry p { color: var(--muted); margin: .5rem 0 0; }
 .wiki-entry [data-wiki] { font-family: var(--font-mono); color: var(--accent); }
 #subnet-wiki.stale { opacity: .45; transition: opacity .15s ease; }
+
+/* ---------- Character representations table + tool wiki ---------- */
+.tool-wiki { margin-top: 2rem; }
+.char-repr { margin-top: 2rem; }
+.repr-wrap {
+  overflow-x: auto; background: var(--bg-alt);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.repr-table { border-collapse: collapse; font-family: var(--font-mono); font-size: .85rem; }
+.repr-table th {
+  position: sticky; left: 0; background: var(--bg-alt); color: var(--muted);
+  text-align: left; font-weight: 600; padding: .35rem .6rem;
+  border-bottom: 1px solid var(--border); white-space: nowrap; z-index: 1;
+}
+.repr-table td {
+  padding: .35rem .6rem; border-bottom: 1px solid var(--border);
+  border-left: 1px solid var(--border); white-space: nowrap; color: var(--text);
+}
+.repr-table tr:last-child th, .repr-table tr:last-child td { border-bottom: 0; }
+.repr-table td[class*="chip-"] {
+  color: var(--chip-color, var(--text));
+  /* Neutralize chip-class side effects that target the chip elements:
+     .chip-invisible sets a background tint, .chip-space a dashed border. */
+  background: transparent;
+  border-style: solid;
+}
+#repr-placeholder { margin: .75rem 0; }
