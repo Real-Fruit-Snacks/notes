@@ -30,6 +30,11 @@
     </div>
     <p id="repr-placeholder" class="char-placeholder muted">Paste text above to see its representations.</p>
   </section>
+  <section class="char-hashes" id="char-hashes">
+    <h2>MD5</h2>
+    <dl id="md5-grid" class="subnet-facts" hidden></dl>
+    <p id="md5-placeholder" class="char-placeholder muted">Paste text above to hash it.</p>
+  </section>
   <section class="tool-wiki" id="char-wiki">
     <h2>Understanding the representations</h2>
     <details class="wiki-entry">
@@ -100,6 +105,21 @@
       <code>h</code> stays <code>h</code>. (This table uses the browser's
       <code>encodeURIComponent</code>, which also leaves <code>!</code>
       <code>'</code> <code>(</code> <code>)</code> <code>*</code> alone.)</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>MD5 &amp; the newline gotcha</summary>
+      <p>MD5 condenses any input into a 128-bit fingerprint, written as 32 hex
+      digits. It hashes <strong>bytes</strong>, not characters — here, the
+      UTF-8 bytes shown in the table above. <code>echo "text" | md5sum</code>
+      appends a trailing newline before hashing, which is why its digest
+      matches the <strong>MD5 + LF</strong> row rather than the plain one;
+      Windows tools that append <code>\r\n</code> match the
+      <strong>+ CRLF</strong> row. One invisible byte, completely different
+      fingerprint.</p>
+      <p>A caveat: MD5 is cryptographically broken — collisions can be
+      manufactured — so it's fine for checksums, cache keys and spotting
+      accidental corruption, but should never protect passwords or
+      signatures.</p>
     </details>
   </section>
 </article>

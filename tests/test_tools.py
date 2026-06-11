@@ -125,4 +125,13 @@ def test_characters_repr_and_wiki_present(config):
     assert 'id="char-repr"' in html
     assert 'id="repr-table"' in html
     assert 'id="char-wiki"' in html
-    assert html.count('class="wiki-entry"') == 9
+    assert html.count('class="wiki-entry"') == 10
+
+
+def test_characters_md5_present(config):
+    build_site(config)
+    html = (config.out / "tools" / "characters.html").read_text(encoding="utf-8")
+    assert 'id="char-hashes"' in html
+    assert 'id="md5-grid"' in html
+    assert 'id="md5-placeholder"' in html
+    assert "MD5 &amp; the newline gotcha" in html
