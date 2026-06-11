@@ -686,6 +686,7 @@ pre.mermaid:not([data-processed]) {
   display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
   font-family: var(--font-mono); margin: 1rem 0 .25rem;
 }
+.subnet-bits .octet { display: flex; flex-wrap: nowrap; gap: 2px; align-items: stretch; }
 .bit {
   border: 1px solid; border-radius: 4px; min-width: 1.4em;
   text-align: center; padding: .05rem 0; font-size: .9rem;

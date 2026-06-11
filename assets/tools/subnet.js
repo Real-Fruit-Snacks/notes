@@ -174,20 +174,26 @@
 
   function renderBits(ip, n) {
     bitsEl.textContent = "";
-    for (var i = 0; i < 32; i++) {
-      if (i > 0 && i % 8 === 0) {
+    for (var g = 0; g < 4; g++) {
+      if (g > 0) {
         var dot = document.createElement("span");
         dot.className = "bit-dot";
         dot.textContent = ".";
         bitsEl.appendChild(dot);
       }
-      if (i === n) bitsEl.appendChild(boundary());
-      var bit = document.createElement("span");
-      bit.className = "bit " + (i < n ? "bit-net" : "bit-host");
-      bit.textContent = String((ip >>> (31 - i)) & 1);
-      bitsEl.appendChild(bit);
+      var group = document.createElement("span");
+      group.className = "octet";
+      for (var j = 0; j < 8; j++) {
+        var i = g * 8 + j;
+        if (i === n) group.appendChild(boundary());
+        var bit = document.createElement("span");
+        bit.className = "bit " + (i < n ? "bit-net" : "bit-host");
+        bit.textContent = String((ip >>> (31 - i)) & 1);
+        group.appendChild(bit);
+      }
+      if (g === 3 && n === 32) group.appendChild(boundary());
+      bitsEl.appendChild(group);
     }
-    if (n === 32) bitsEl.appendChild(boundary());
   }
 
   // ---- state & events ----
@@ -224,7 +230,10 @@
     clearTimeout(timer);
     timer = setTimeout(function () { recompute(false); }, 150);
   });
-  slider.addEventListener("input", function () { recompute(true); });
+  slider.addEventListener("input", function () {
+    clearTimeout(timer);
+    recompute(true);
+  });
 
   recompute(false);
 })();
