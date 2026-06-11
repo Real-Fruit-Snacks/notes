@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import posixpath
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -19,17 +19,24 @@ from .text import plain_text
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 
 
+def _parse_iso(value: str) -> datetime | None:
+    """fromisoformat with Python 3.10 tolerance for a trailing 'Z'."""
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except ValueError:
+        return None
+
+
 def _rfc822_date(date_str: str) -> str:
     """ISO frontmatter date -> RFC 822 for RSS ``<pubDate>`` (empty if unparseable)."""
-    from datetime import datetime, timezone
     from email.utils import format_datetime
 
-    try:
-        dt = datetime.fromisoformat(date_str)
-    except ValueError:
+    dt = _parse_iso(date_str)
+    if dt is None:
         return ""
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
     return format_datetime(dt)
 
 
@@ -116,10 +123,15 @@ class Renderer:
                 tag=tag, notes=tagged, nav=nav, all_tags=sorted(tags),
             )
 
+        _epoch = datetime.fromtimestamp(0, tz=timezone.utc)
         index_tpl = self.env.get_template("index.html")
         pages["index.html"] = index_tpl.render(
             notes=sorted(notes, key=lambda n: n.title.lower()), nav=nav, all_tags=sorted(tags),
-            recent=sorted(notes, key=lambda n: datetime.fromisoformat(n.updated), reverse=True)[:8],
+            recent=sorted(
+                notes,
+                key=lambda n: _parse_iso(n.updated) or _epoch,
+                reverse=True,
+            )[:8],
         )
 
         graph_tpl = self.env.get_template("graph.html")
@@ -144,12 +156,12 @@ class Renderer:
                 "User-agent: *\nAllow: /\n\n"
                 f"Sitemap: {self.config.abs_url('sitemap.xml')}\n"
             )
+            pages["sitemap.xml"] = self._sitemap(notes, sorted(tags))
+            pages["feed.xml"] = self._rss(notes)
 
         pages["graph.json"] = json.dumps(graph_data)
         pages["search.json"] = json.dumps(self._search_index(notes))
         pages["excerpts.json"] = json.dumps(self._excerpts(notes))
-        pages["sitemap.xml"] = self._sitemap(notes, sorted(tags))
-        pages["feed.xml"] = self._rss(notes)
         return pages
 
     def _search_index(self, notes: list[Note]) -> list[dict]:

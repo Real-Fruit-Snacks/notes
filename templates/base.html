@@ -26,7 +26,7 @@
   <link rel="icon" type="image/svg+xml" href="{{ base_url }}assets/favicon.svg">
   {% if cards_enabled %}<link rel="apple-touch-icon" href="{{ base_url }}apple-touch-icon.png">{% endif %}
   <link rel="manifest" href="{{ base_url }}site.webmanifest">
-  <link rel="alternate" type="application/rss+xml" title="{{ site_title }}" href="{{ base_url }}feed.xml">
+  {% if site_url %}<link rel="alternate" type="application/rss+xml" title="{{ site_title }}" href="{{ base_url }}feed.xml">{% endif %}
   {% if site_url and canonical_path is defined and canonical_path %}<link rel="canonical" href="{{ abs_url(canonical_path) }}">{% endif %}
   {% block head %}{% endblock %}
 </head>
@@ -59,7 +59,7 @@
       {% block content %}{% endblock %}
       <footer class="site-footer">
         <span>Built with <a href="{{ base_url }}index.html">{{ site_title }}</a></span>
-        <a href="{{ base_url }}feed.xml">RSS</a>
+        {% if site_url %}<a href="{{ base_url }}feed.xml">RSS</a>{% endif %}
       </footer>
     </main>
   </div>

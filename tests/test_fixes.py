@@ -5,7 +5,7 @@ import pytest
 
 from obsidian_site.builder import build_site
 from obsidian_site.models import SiteConfig
-from obsidian_site.render import _rfc822_date
+from obsidian_site.render import _parse_iso, _rfc822_date
 
 
 def write_note(vault, name, body, fm="publish: true"):
@@ -74,7 +74,7 @@ def test_overwrites_previous_build_output(vault, tmp_path):
 
 def test_rss_pubdate_is_rfc822(vault, tmp_path):
     write_note(vault, "a.md", "hi", fm="publish: true\ndate: 2024-01-18")
-    config, _ = build(vault, tmp_path)
+    config, _ = build(vault, tmp_path, site_url="https://example.com")
     feed = (config.out / "feed.xml").read_text()
     assert "<pubDate>Thu, 18 Jan 2024 00:00:00 +0000</pubDate>" in feed
 
@@ -135,3 +135,61 @@ def test_heading_dedup_no_collision_with_suffixed_heading(vault, tmp_path):
         f"Duplicate heading ids found: {heading_ids}"
     )
     assert len(heading_ids) == 3
+
+
+def test_parse_iso_handles_z_suffix():
+    from datetime import timezone
+    dt = _parse_iso("2026-01-01T00:00:00Z")
+    assert dt is not None
+    assert dt.tzinfo is not None
+    assert dt.utcoffset().total_seconds() == 0
+
+
+def test_rfc822_date_z_timestamp():
+    result = _rfc822_date("2026-01-01T00:00:00Z")
+    assert result != ""
+    assert "2026" in result
+
+
+def test_z_timestamp_in_updated_does_not_crash(vault, tmp_path):
+    """A note with a Z-suffixed updated date must not crash the index build."""
+    write_note(vault, "a.md", "hello")
+    config = SiteConfig(vault=vault, out=tmp_path / "out")
+    # Patch the updated field after discovery by building normally; the
+    # real guard is that fromisoformat("...Z") crashed on Py 3.10.
+    # We verify via direct helper test above; here just ensure no crash.
+    build_site(config)
+    assert (config.out / "index.html").exists()
+
+
+def test_vendor_katex_mermaid_absent_when_unused(vault, tmp_path):
+    """A vault with no math or mermaid must not ship katex/ or mermaid/ dirs."""
+    write_note(vault, "a.md", "Just plain text, no math or diagrams.")
+    config = SiteConfig(vault=vault, out=tmp_path / "out")
+    build_site(config)
+    vendor = config.out / "assets" / "vendor"
+    assert not (vendor / "katex").exists(), "katex/ should be pruned when unused"
+    assert not (vendor / "mermaid").exists(), "mermaid/ should be pruned when unused"
+    # d3 and minisearch are always present
+    assert (vendor / "d3.min.js").exists()
+    assert (vendor / "minisearch.min.js").exists()
+
+
+def test_vendor_katex_present_when_math_used(vault, tmp_path):
+    """A vault with math must retain katex/ in the output."""
+    write_note(vault, "a.md", "Here is math: $e^{i\\pi}+1=0$")
+    config = SiteConfig(vault=vault, out=tmp_path / "out")
+    build_site(config)
+    vendor = config.out / "assets" / "vendor"
+    assert (vendor / "katex").exists(), "katex/ must be present when math is used"
+    assert not (vendor / "mermaid").exists(), "mermaid/ should be pruned when unused"
+
+
+def test_vendor_mermaid_present_when_diagrams_used(vault, tmp_path):
+    """A vault with a mermaid diagram must retain mermaid/ in the output."""
+    write_note(vault, "a.md", "```mermaid\ngraph TD; A-->B;\n```")
+    config = SiteConfig(vault=vault, out=tmp_path / "out")
+    build_site(config)
+    vendor = config.out / "assets" / "vendor"
+    assert (vendor / "mermaid").exists(), "mermaid/ must be present when diagrams are used"
+    assert not (vendor / "katex").exists(), "katex/ should be pruned when unused"

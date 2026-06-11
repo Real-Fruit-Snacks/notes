@@ -88,12 +88,23 @@ def test_excerpts_json(config):
     assert data["welcome"]["url"] == "/myrepo/welcome.html"
 
 
-def test_sitemap_and_feed_and_404(config):
-    build_site(config)
-    assert (config.out / "404.html").exists()
-    assert (config.out / "sitemap.xml").exists()
-    feed = (config.out / "feed.xml").read_text()
+def test_sitemap_and_feed_and_404(tmp_path, vault_path):
+    # feed.xml and sitemap.xml are only emitted when site_url is set.
+    cfg = SiteConfig(vault=vault_path, out=tmp_path / "dist", base_url="/myrepo/",
+                     site_url="https://example.com")
+    build_site(cfg)
+    assert (cfg.out / "404.html").exists()
+    assert (cfg.out / "sitemap.xml").exists()
+    feed = (cfg.out / "feed.xml").read_text()
     assert "<rss" in feed and "<item>" in feed
+
+
+def test_no_feed_or_sitemap_without_site_url(config):
+    build_site(config)
+    assert not (config.out / "feed.xml").exists()
+    assert not (config.out / "sitemap.xml").exists()
+    html = (config.out / "welcome.html").read_text()
+    assert "feed.xml" not in html
 
 
 def test_strikethrough_and_tasklists(tmp_path):
