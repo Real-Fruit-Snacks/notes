@@ -38,6 +38,19 @@
       document.documentElement.getAttribute("data-sidebar") === "collapsed" ? "false" : "true");
   }
 
+  // Re-sync when crossing the desktop/mobile breakpoint.
+  desktop.addEventListener("change", function (e) {
+    if (e.matches) {
+      // Entering desktop: clear any mobile drawer state, reflect collapse state.
+      close();
+      btn.setAttribute("aria-expanded",
+        document.documentElement.getAttribute("data-sidebar") === "collapsed" ? "false" : "true");
+    } else {
+      // Entering mobile: drawer starts closed.
+      btn.setAttribute("aria-expanded", "false");
+    }
+  });
+
   btn.addEventListener("click", function () {
     if (desktop.matches) {
       document.documentElement.getAttribute("data-sidebar") === "collapsed"
@@ -52,7 +65,7 @@
     if (e.target.tagName === "A") close();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") close();
+    if (e.key === "Escape" && !desktop.matches) close();
   });
 })();
 
