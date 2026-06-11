@@ -24,8 +24,21 @@ def _is_safe_to_replace(out: Path) -> bool:
     return not entries or (out / ".nojekyll").exists()
 
 
-def emit(config: SiteConfig, pages: dict[str, str], image_assets: set[str]) -> list[str]:
+def emit(
+    config: SiteConfig,
+    pages: dict[str, str],
+    image_assets: set[str],
+    *,
+    include_katex: bool = True,
+    include_mermaid: bool = True,
+) -> list[str]:
     """Write ``pages`` to ``config.out`` and copy CSS/JS + referenced images.
+
+    ``include_katex`` / ``include_mermaid`` control whether the corresponding
+    vendor bundles (~1.5 MB and ~2.7 MB respectively) are kept in the output.
+    Pass ``False`` when no note in the build uses that feature to avoid shipping
+    unused assets.  d3 and minisearch are always included (graph + search are
+    present on every site).
 
     Returns a list of warnings (e.g. missing image embeds).
     """
@@ -50,6 +63,17 @@ def emit(config: SiteConfig, pages: dict[str, str], image_assets: set[str]) -> l
     assets_out = out / "assets"
     shutil.copytree(STATIC_DIR, assets_out, dirs_exist_ok=True)
     (assets_out / "pygments.css").write_text(pygments_css(), encoding="utf-8")
+
+    # Remove unused vendor bundles from the OUTPUT (never touches the source tree).
+    vendor_out = assets_out / "vendor"
+    if not include_katex:
+        katex_dir = vendor_out / "katex"
+        if katex_dir.exists():
+            shutil.rmtree(katex_dir)
+    if not include_mermaid:
+        mermaid_dir = vendor_out / "mermaid"
+        if mermaid_dir.exists():
+            shutil.rmtree(mermaid_dir)
 
     # 3. Referenced images, looked up by filename anywhere in the vault.
     if image_assets:

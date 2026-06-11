@@ -59,7 +59,11 @@ def build_site(config: SiteConfig) -> list[str]:
     pages = Renderer(config, cards_enabled=cards_enabled).render_site(notes, graph_data)
 
     # 5. emit to disk (+ social cards, written after emit clears the out dir)
-    warnings += emit(config, pages, image_assets)
+    warnings += emit(
+        config, pages, image_assets,
+        include_katex=any(n.has_math for n in notes),
+        include_mermaid=any(n.has_mermaid for n in notes),
+    )
     if config.site_url:
         warnings += cards.generate_cards(config, notes)
     return warnings
