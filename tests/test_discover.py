@@ -1,7 +1,10 @@
 """Tests for stage 1: discovery + publish filtering."""
 from __future__ import annotations
 
-from obsidian_site.discover import discover, slugify
+import pytest
+
+from obsidian_site.discover import discover, discover_with_warnings, slugify
+from obsidian_site.models import SiteConfig
 
 
 def test_slugify_basic():
@@ -53,3 +56,54 @@ def test_resolution_map_keys(config):
     assert resolution["snippet"] == "snippet"
     # unpublished note absent
     assert "secret note" not in resolution
+
+
+# --- Fix 4: slugify improvements ---
+
+
+def test_slugify_accented_latin(tmp_path):
+    """NFKD normalisation: accented characters fold to ASCII equivalents."""
+    assert slugify("Café") == "cafe"
+    assert slugify("naïve") == "naive"
+    assert slugify("résumé") == "resume"
+
+
+def test_slugify_underscore_becomes_dash():
+    """Underscores must be converted to dashes, not silently dropped."""
+    assert slugify("Same_Note") == "same-note"
+    assert slugify("my_file_name") == "my-file-name"
+
+
+@pytest.fixture
+def vault_nonlatin(tmp_path):
+    v = tmp_path / "vault"
+    v.mkdir()
+    return v
+
+
+def _write(vault, name, text):
+    path = vault / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+def _build_notes(vault, tmp_path):
+    config = SiteConfig(vault=vault, out=tmp_path / "out")
+    notes, _ = discover_with_warnings(config)
+    return notes
+
+
+def test_nonlatin_filenames_get_distinct_deterministic_slugs(vault_nonlatin, tmp_path):
+    """Fully non-Latin filenames must yield distinct, deterministic slugs (not 'untitled')."""
+    _write(vault_nonlatin, "日本語.md", "---\npublish: true\n---\nhello")
+    _write(vault_nonlatin, "한국어.md", "---\npublish: true\n---\nhello")
+    notes1 = _build_notes(vault_nonlatin, tmp_path)
+    # Build again (fresh config, same vault) for determinism check.
+    notes2 = _build_notes(vault_nonlatin, tmp_path)
+
+    slugs1 = {n.slug for n in notes1}
+    slugs2 = {n.slug for n in notes2}
+
+    assert len(slugs1) == 2, f"Expected 2 distinct slugs, got: {slugs1}"
+    assert "untitled" not in slugs1
+    assert slugs1 == slugs2, "Slugs are not stable across builds"

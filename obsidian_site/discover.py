@@ -7,7 +7,9 @@ that an Obsidian `[[link]]` might use: the file stem, the vault-relative path
 """
 from __future__ import annotations
 
+import hashlib
 import re
+import unicodedata
 from pathlib import Path
 
 import frontmatter
@@ -34,14 +36,45 @@ _INDENTED_CODE = re.compile(r"^(?: {4}|\t).*$", re.MULTILINE)
 
 
 def slugify(text: str) -> str:
-    """Turn arbitrary text into a url-safe slug, preserving ``/`` separators."""
+    """Turn arbitrary text into a url-safe slug, preserving ``/`` separators.
+
+    Steps:
+    1. NFKD-fold so accented Latin characters survive (e.g. 'Café' → 'cafe').
+    2. Lowercase.
+    3. Replace spaces and underscores with '-' *before* stripping so
+       'Same_Note' → 'same-note' rather than 'samenote'.
+    4. Strip non-slug characters.
+    5. Collapse consecutive dashes and clean up dash/slash boundaries.
+    """
+    # 4a: NFKD normalisation + ASCII encoding strips accents, ligatures, etc.
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     text = text.strip().lower()
-    text = _SLUG_STRIP.sub("", text)
+    # 4b: replace spaces/underscores BEFORE the strip regex so they become '-'
+    # rather than being silently deleted.
     text = _SLUG_SPACES.sub("-", text)
+    text = _SLUG_STRIP.sub("", text)
     text = _SLUG_DASHES.sub("-", text)
     text = re.sub(r"/-+", "/", text)
     text = re.sub(r"-+/", "/", text)
     return text.strip("-/") or "untitled"
+
+
+def _slugify_path_segment(segment: str) -> str:
+    """Slugify one path segment with a stable fallback for fully non-Latin names.
+
+    When ``slugify()`` returns empty (e.g. '日本語' has no ASCII equivalent),
+    we fall back to ``n-<first 8 hex chars of SHA-1>`` so that two different
+    non-Latin filenames always get *distinct* and *deterministic* slugs instead
+    of both becoming 'untitled'.
+
+    Plain ``slugify()`` is unchanged for all other uses (heading anchors, tags).
+    The seam is the path-segment slug assignment in ``discover_with_warnings``.
+    """
+    slug = slugify(segment)
+    if slug == "untitled":
+        digest = hashlib.sha1(segment.encode("utf-8")).hexdigest()[:8]
+        return f"n-{digest}"
+    return slug
 
 
 def _normalise_tags(value) -> list[str]:
@@ -133,7 +166,10 @@ def discover_with_warnings(config: SiteConfig) -> tuple[list[Note], list[str]]:
 
         rel = md_path.relative_to(config.vault)
         title = str(post.get("title") or md_path.stem)
-        base_slug = slugify(str(rel.with_suffix("")))
+        # Slugify each path segment individually so a fully non-Latin segment
+        # gets a stable sha1-based fallback rather than 'untitled'.
+        rel_parts = rel.with_suffix("").parts
+        base_slug = "/".join(_slugify_path_segment(p) for p in rel_parts)
         slug = base_slug
         n = 2
         while slug in used_slugs:
