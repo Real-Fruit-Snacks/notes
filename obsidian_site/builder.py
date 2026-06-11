@@ -16,6 +16,7 @@ RESERVED_PAGES = {
     "graph": "graph",
     "characters": "tools/characters",
     "character inspector": "tools/characters",
+    "subnet calculator": "tools/subnet",
 }
 
 

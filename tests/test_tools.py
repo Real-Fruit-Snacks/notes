@@ -72,6 +72,32 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     sitemap = (config.out / "sitemap.xml").read_text(encoding="utf-8")
     assert "https://example.com/myrepo/tools/characters.html" in sitemap
     assert "https://example.com/myrepo/graph.html" in sitemap
+    assert "https://example.com/myrepo/tools/subnet.html" in sitemap
+
+
+def test_subnet_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "subnet.html").read_text(encoding="utf-8")
+    assert 'id="subnet-input"' in html
+    assert 'id="subnet-prefix"' in html
+    assert 'id="subnet-facts"' in html
+    assert "/myrepo/assets/tools/subnet.js" in html
+
+
+def test_subnet_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\nUse the [[Subnet Calculator]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/subnet.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Subnet" in w for w in warnings)
 
 
 def test_topbar_has_tools_dropdown(config):

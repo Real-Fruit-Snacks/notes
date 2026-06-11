@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/subnet.html" %}
+{% block title %}Subnet Calculator · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Subnet Calculator</h1>
+  <p class="muted">IPv4 CIDR math, live. Type a network like
+  <code>192.168.1.0/24</code> (a dotted netmask works too) or drag the prefix
+  slider — the binary view shows which bits are network and which are host.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <div class="subnet-input-row">
+    <input type="text" id="subnet-input" class="subnet-input" value="192.168.1.0/24"
+      autocomplete="off" autocapitalize="off" spellcheck="false"
+      aria-label="Network in CIDR notation">
+    <input type="range" id="subnet-prefix" class="subnet-prefix" min="0" max="32"
+      value="24" aria-label="Prefix length">
+    <span id="subnet-prefix-label" class="subnet-prefix-label">/24</span>
+  </div>
+  <p id="subnet-error" class="subnet-error" hidden aria-live="polite"></p>
+  <div id="subnet-output">
+    <div id="subnet-bits" class="subnet-bits" aria-hidden="true"></div>
+    <p class="subnet-legend muted"><span class="legend-net">network bits</span> · <span class="legend-host">host bits</span></p>
+    <dl id="subnet-facts" class="subnet-facts"></dl>
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/subnet.js"></script>
+{% endblock %}
