@@ -1,10 +1,26 @@
 // Mobile navigation drawer: hamburger toggles the sidebar + scrim.
+// Desktop: hamburger collapses/expands the sidebar, persisted in localStorage.
 (function () {
   var btn = document.getElementById("nav-toggle");
   var sidebar = document.getElementById("sidebar");
   var scrim = document.getElementById("scrim");
   if (!btn || !sidebar) return;
 
+  var desktop = window.matchMedia("(min-width: 821px)");
+
+  // --- Desktop helpers ---
+  function desktopCollapse() {
+    document.documentElement.setAttribute("data-sidebar", "collapsed");
+    btn.setAttribute("aria-expanded", "false");
+    try { localStorage.setItem("sidebar", "collapsed"); } catch (e) {}
+  }
+  function desktopExpand() {
+    document.documentElement.removeAttribute("data-sidebar");
+    btn.setAttribute("aria-expanded", "true");
+    try { localStorage.removeItem("sidebar"); } catch (e) {}
+  }
+
+  // --- Mobile helpers ---
   function open() {
     document.body.classList.add("nav-open");
     if (scrim) scrim.hidden = false;
@@ -16,8 +32,20 @@
     btn.setAttribute("aria-expanded", "false");
   }
 
+  // Sync aria-expanded with current boot state on desktop.
+  if (desktop.matches) {
+    btn.setAttribute("aria-expanded",
+      document.documentElement.getAttribute("data-sidebar") === "collapsed" ? "false" : "true");
+  }
+
   btn.addEventListener("click", function () {
-    document.body.classList.contains("nav-open") ? close() : open();
+    if (desktop.matches) {
+      document.documentElement.getAttribute("data-sidebar") === "collapsed"
+        ? desktopExpand()
+        : desktopCollapse();
+    } else {
+      document.body.classList.contains("nav-open") ? close() : open();
+    }
   });
   if (scrim) scrim.addEventListener("click", close);
   sidebar.addEventListener("click", function (e) {

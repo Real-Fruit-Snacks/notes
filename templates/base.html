@@ -18,6 +18,11 @@
         var m = document.querySelector('meta[name="theme-color"]');
         if (m) m.setAttribute("content", "#eff1f5");
       }
+      try {
+        if (localStorage.getItem("sidebar") === "collapsed") {
+          document.documentElement.setAttribute("data-sidebar", "collapsed");
+        }
+      } catch (e) {}
     })();
   </script>
   <title>{% block title %}{{ site_title }}{% endblock %}</title>
