@@ -12,7 +12,11 @@ from .render import Renderer
 from .text import excerpt_of
 
 # Built-in pages addressable via wikilinks (lower-cased name -> slug).
-RESERVED_PAGES = {"graph": "graph"}
+RESERVED_PAGES = {
+    "graph": "graph",
+    "characters": "tools/characters",
+    "character inspector": "tools/characters",
+}
 
 
 def build_site(config: SiteConfig) -> list[str]:

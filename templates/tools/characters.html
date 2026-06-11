@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/characters.html" %}
+{% block title %}Character Inspector · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Character Inspector</h1>
+  <p class="muted">Paste text below — every character is classified and colored by
+  type. Hover or click a chip for its code point and Unicode name. Invisible
+  characters (zero-width spaces, control codes, sneaky non-breaking spaces…) are
+  flagged in red.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <textarea id="char-input" class="char-input" rows="6"
+    placeholder="Paste or type text to inspect…" aria-label="Text to inspect"
+    autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+  <p id="char-summary" class="char-summary" aria-live="polite"></p>
+  <p id="char-notice" class="char-notice" hidden></p>
+  <div id="char-detail" class="char-detail" hidden></div>
+  <div id="char-grid" class="char-grid" tabindex="0" role="group"
+       aria-label="Inspected characters (arrow keys to move between them)">
+    <p class="char-placeholder muted">Paste text above to inspect it.</p>
+  </div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/characters.js"></script>
+{% endblock %}
