@@ -636,7 +636,7 @@ pre.mermaid:not([data-processed]) {
   background: var(--bg-alt); border: 1px solid var(--border);
   border-radius: var(--radius);
 }
-.char-grid:focus-visible { outline: 2px solid var(--accent); }
+.char-grid:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chip {
   border: 1px solid var(--chip-color, var(--muted));
   color: var(--chip-color, var(--muted));
