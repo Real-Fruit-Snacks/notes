@@ -710,3 +710,20 @@ pre.mermaid:not([data-processed]) {
 .subnet-facts dt { color: var(--muted); }
 .subnet-facts dd { margin: 0; font-family: var(--font-mono); text-align: right; }
 #subnet-output.stale { opacity: .45; transition: opacity .15s ease; }
+
+/* ---------- Subnet wiki ---------- */
+.subnet-wiki { margin-top: 2rem; }
+.wiki-entry {
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: .55rem .75rem; margin-bottom: .5rem;
+}
+.wiki-entry > summary {
+  cursor: pointer; color: var(--text); font-weight: 600; list-style: none;
+  user-select: none;
+}
+.wiki-entry > summary::-webkit-details-marker { display: none; }
+.wiki-entry > summary::after { content: " ▾"; font-size: .75em; color: var(--muted); }
+.wiki-entry[open] > summary::after { content: " ▴"; }
+.wiki-entry p { color: var(--muted); margin: .5rem 0 0; }
+.wiki-entry [data-wiki] { font-family: var(--font-mono); color: var(--accent); }
+#subnet-wiki.stale { opacity: .45; transition: opacity .15s ease; }
