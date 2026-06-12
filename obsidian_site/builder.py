@@ -18,6 +18,7 @@ RESERVED_PAGES = {
     "character inspector": "tools/characters",
     "subnet calculator": "tools/subnet",
     "certificate checker": "tools/certs",
+    "cron parser": "tools/cron",
 }
 
 

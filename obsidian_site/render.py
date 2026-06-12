@@ -147,6 +147,9 @@ class Renderer:
         certs_tpl = self.env.get_template("tools/certs.html")
         pages["tools/certs.html"] = certs_tpl.render(nav=nav)
 
+        cron_tpl = self.env.get_template("tools/cron.html")
+        pages["tools/cron.html"] = cron_tpl.render(nav=nav)
+
         pages["404.html"] = self.env.get_template("404.html").render(nav=nav)
 
         pages["site.webmanifest"] = json.dumps({
@@ -204,6 +207,7 @@ class Renderer:
             self.config.abs_url("tools/characters.html"),
             self.config.abs_url("tools/subnet.html"),
             self.config.abs_url("tools/certs.html"),
+            self.config.abs_url("tools/cron.html"),
         ]
         urls += [self.config.abs_url(f"tags/{slugify(t)}.html") for t in tags]
         urls = [u for u in urls if u]  # only when site_url is configured

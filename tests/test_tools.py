@@ -74,6 +74,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/graph.html" in sitemap
     assert "https://example.com/myrepo/tools/subnet.html" in sitemap
     assert "https://example.com/myrepo/tools/certs.html" in sitemap
+    assert "https://example.com/myrepo/tools/cron.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -111,6 +112,8 @@ def test_topbar_has_tools_dropdown(config):
     assert ">Subnet Calculator</a>" in html
     assert 'href="/myrepo/tools/certs.html"' in html
     assert ">Certificate Checker</a>" in html
+    assert 'href="/myrepo/tools/cron.html"' in html
+    assert ">Cron Parser</a>" in html
 
 
 def test_subnet_wiki_present(config):
@@ -170,8 +173,37 @@ def test_certs_wikilink_resolves(tmp_path):
 
 def test_tool_example_buttons(config):
     build_site(config)
-    for page in ("characters", "subnet", "certs"):
+    for page in ("characters", "subnet", "certs", "cron"):
         html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
         assert html.count('class="tool-examples"') == 1, page
         assert html.count('class="example-btn"') == 3, page
         assert 'data-example="' in html, page
+
+
+def test_cron_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "cron.html").read_text(encoding="utf-8")
+    assert 'id="cron-input"' in html
+    assert 'id="cron-desc"' in html
+    assert 'id="cron-fields"' in html
+    assert 'id="cron-runs"' in html
+    assert 'id="cron-wiki"' in html
+    assert "/myrepo/assets/tools/cron.js" in html
+    assert html.count('class="wiki-entry"') == 9
+
+
+def test_cron_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Cron Parser]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/cron.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Cron" in w for w in warnings)

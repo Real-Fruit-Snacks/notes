@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/cron.html" %}
+{% block title %}Cron Parser · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Cron Parser</h1>
+  <p class="muted">Paste a crontab schedule like <code>*/15 2 * * 1-5</code> —
+  get it in plain English, field by field, plus the next ten run times in your
+  browser's local timezone.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <input type="text" id="cron-input" class="subnet-input cron-input" value="*/15 2 * * 1-5"
+    autocomplete="off" autocapitalize="off" spellcheck="false"
+    aria-label="Cron expression">
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="quarter">*/15 2 * * 1-5</button>
+    <button type="button" class="example-btn" data-example="names">0 9 * * MON,WED,FRI</button>
+    <button type="button" class="example-btn" data-example="trap">0 0 13 * FRI</button>
+  </div>
+  <p id="cron-error" class="subnet-error" hidden aria-live="polite"></p>
+  <div id="cron-output">
+    <p id="cron-desc" class="cron-desc" aria-live="polite"></p>
+    <dl id="cron-fields" class="subnet-facts" aria-live="polite" aria-atomic="true"></dl>
+    <h2 class="cron-runs-title">Next 10 runs</h2>
+    <ol id="cron-runs" class="cron-runs"></ol>
+  </div>
+  <section class="tool-wiki" id="cron-wiki">
+    <h2>Understanding the fields</h2>
+    <details class="wiki-entry">
+      <summary>Five fields, one line</summary>
+      <p>A classic cron schedule is five space-separated fields — <strong>minute,
+      hour, day&nbsp;of&nbsp;month, month, day&nbsp;of&nbsp;week</strong> — read
+      left to right: <code>*/15 2 * * 1-5</code> means every 15th minute, of
+      hour 2, any date, any month, Monday–Friday. Six- or seven-field
+      expressions with a seconds column are Quartz/Spring extensions, not
+      classic cron, and this page doesn't parse them.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Minute (0–59)</summary>
+      <p>The first field picks minutes within the hour. <code>0</code> fires on
+      the hour, <code>*/15</code> every quarter hour, <code>5/10</code> at
+      :05, :15, :25… (start at 5, step by 10). Cron's resolution stops here —
+      there are no seconds.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Hour (0–23)</summary>
+      <p>The second field uses the 24-hour clock: <code>0</code> is midnight,
+      <code>14</code> is 2 PM. <code>9-17</code> covers the working day. The
+      run times this page projects use your browser's local clock — the same
+      expression on a server in another timezone fires at different wall-clock
+      moments.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Day of month (1–31)</summary>
+      <p>The third field picks calendar dates. A date a month doesn't have is
+      simply skipped — <code>0 0 31 * *</code> quietly runs only in the seven
+      31-day months, and <code>0 0 29 2 *</code> waits for leap years. Beware
+      the interaction with day of week (see the trap below).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Month (1–12 or JAN–DEC)</summary>
+      <p>The fourth field accepts numbers (1 = January) or three-letter names,
+      case-insensitive: <code>JAN</code>, <code>jun</code>,
+      <code>DEC</code>. Ranges and lists work with names too —
+      <code>MAR-MAY</code>, <code>JAN,JUL</code>.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Day of week (0–7 or SUN–SAT)</summary>
+      <p>The fifth field counts from Sunday: 0 is Sunday, 1 is Monday … 6 is
+      Saturday — and most crons accept <strong>7 as Sunday too</strong> (this
+      page does). Three-letter names work: <code>MON-FRI</code>,
+      <code>SAT,SUN</code>. Weekday ranges don't wrap around the week, so
+      write <code>FRI-SUN</code> as <code>FRI,SAT,SUN</code> or
+      <code>0,5,6</code>.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Steps, ranges &amp; lists</summary>
+      <p>Every field accepts a number, a range <code>a-b</code> (inclusive), a
+      step <code>*/n</code> (every n-th value), a stepped range
+      <code>9-17/2</code>, a bare start-with-step <code>5/10</code> (from 5 to
+      the field's maximum, by 10), and comma-separated lists mixing all of the
+      above — <code>0,30 8-11,13-16 * * MON,WED,FRI</code> is perfectly
+      legal.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The day-of-month / day-of-week trap</summary>
+      <p>When <em>both</em> day fields are restricted, cron runs when
+      <strong>either</strong> one matches — not both. <code>0 0 13 * FRI</code>
+      fires on every Friday <em>and</em> on the 13th of every month, not just
+      on Friday the 13th. The OR only applies when neither field starts with
+      <code>*</code>; with a star (even a stepped one like <code>*/2</code>)
+      the two fields must both match.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>@shortcuts &amp; quirks</summary>
+      <p>Most crons accept <code>@hourly</code>, <code>@daily</code>
+      (= <code>@midnight</code>), <code>@weekly</code>, <code>@monthly</code>
+      and <code>@yearly</code> (= <code>@annually</code>) as shorthand for the
+      five-field forms — this page expands them. <code>@reboot</code> runs once
+      at boot and has no calendar schedule at all. Around daylight-saving
+      jumps, runs in the skipped or repeated hour shift with your system
+      clock's rules — classic cron is similarly fuzzy there.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/cron.js"></script>
+{% endblock %}
