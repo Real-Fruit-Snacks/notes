@@ -10,6 +10,7 @@ __pycache__/
 # OS / editor
 .DS_Store
 .obsidian/
+vault/.obsidian/
 
 # Local tooling state (never published)
 .omc/
