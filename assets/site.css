@@ -970,8 +970,22 @@ pre.mermaid:not([data-processed]) {
 .ports-search { flex: 1 1 14rem; }
 .ports-proto { margin-top: 0; }
 .ports-cat { flex: 0 1 auto; width: auto; font-family: var(--font-body); }
-.ports-bands { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
-.ports-wrap { overflow-x: auto; margin-top: .6rem; }
+.ports-bands {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: .6rem; margin-top: 1rem;
+}
+.ports-band {
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: .55rem .8rem;
+}
+.band-wellknown { border-top: 3px solid var(--ctp-blue); }
+.band-registered { border-top: 3px solid var(--ctp-teal); }
+.band-dynamic { border-top: 3px solid var(--ctp-peach); }
+.band-range { display: block; font-family: var(--font-mono); font-size: .78rem; color: var(--muted); }
+.band-name { font-weight: 600; }
+.ports-band p { margin: .1rem 0 0; font-size: .84rem; color: var(--muted); line-height: 1.5; }
+.ports-count { font-size: .85rem; margin: 1rem 0 0; }
+.ports-wrap { overflow-x: auto; margin-top: .4rem; }
 .ports-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .ports-table th {
   text-align: left; font-size: .74rem; text-transform: uppercase;
@@ -979,6 +993,7 @@ pre.mermaid:not([data-processed]) {
   border-bottom: 1px solid var(--border);
 }
 .ports-table td { padding: .4rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ports-table tbody tr:hover { background: var(--accent-soft); }
 .port-num { font-family: var(--font-mono); font-weight: 600; }
 .port-proto, .port-name { font-family: var(--font-mono); font-size: .82rem; white-space: nowrap; }
 .port-cat {
@@ -986,6 +1001,23 @@ pre.mermaid:not([data-processed]) {
   border-radius: 999px; border: 1px solid var(--border); color: var(--muted);
   white-space: nowrap;
 }
+.port-cat-web { border-color: var(--ctp-blue); color: var(--ctp-blue); }
+.port-cat-vpn { border-color: var(--ctp-blue); color: var(--ctp-blue); }
+.port-cat-mail { border-color: var(--ctp-sapphire); color: var(--ctp-sapphire); }
+.port-cat-windows { border-color: var(--ctp-sapphire); color: var(--ctp-sapphire); }
+.port-cat-file { border-color: var(--ctp-teal); color: var(--ctp-teal); }
+.port-cat-remote { border-color: var(--ctp-mauve); color: var(--ctp-mauve); }
+.port-cat-dev { border-color: var(--ctp-mauve); color: var(--ctp-mauve); }
+.port-cat-name { border-color: var(--ctp-lavender); color: var(--ctp-lavender); }
+.port-cat-print { border-color: var(--ctp-lavender); color: var(--ctp-lavender); }
+.port-cat-auth { border-color: var(--ctp-yellow); color: var(--ctp-yellow); }
+.port-cat-mon { border-color: var(--ctp-yellow); color: var(--ctp-yellow); }
+.port-cat-db { border-color: var(--ctp-peach); color: var(--ctp-peach); }
+.port-cat-iot { border-color: var(--ctp-peach); color: var(--ctp-peach); }
+.port-cat-msg { border-color: var(--ctp-pink); color: var(--ctp-pink); }
+.port-cat-game { border-color: var(--ctp-pink); color: var(--ctp-pink); }
+.port-cat-voip { border-color: var(--ctp-green); color: var(--ctp-green); }
+.port-cat-infra { border-color: var(--ctp-green); color: var(--ctp-green); }
 .port-cat-evil { border-color: var(--ctp-red); color: var(--ctp-red); }
 .port-desc { line-height: 1.45; }
 .port-note { display: block; color: var(--muted); font-size: .82rem; }

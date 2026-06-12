@@ -28,12 +28,24 @@
     <button type="button" class="example-btn" data-example="rdp">3389 (RDP)</button>
     <button type="button" class="example-btn" data-example="redis">redis</button>
   </div>
-  <dl class="subnet-facts ports-bands">
-    <div class="fact"><dt>0–1023</dt><dd>well-known · root/admin to bind (traditionally)</dd></div>
-    <div class="fact"><dt>1024–49151</dt><dd>registered · first-come listings with IANA</dd></div>
-    <div class="fact"><dt>49152–65535</dt><dd>dynamic · ephemeral source ports, never assigned</dd></div>
-  </dl>
-  <p id="ports-count" class="char-notice" aria-live="polite"></p>
+  <div class="ports-bands">
+    <div class="ports-band band-wellknown">
+      <span class="band-range">0 – 1023</span>
+      <span class="band-name">Well-known</span>
+      <p>Standardized services; traditionally root-only to bind.</p>
+    </div>
+    <div class="ports-band band-registered">
+      <span class="band-range">1024 – 49151</span>
+      <span class="band-name">Registered</span>
+      <p>First-come vendor listings with IANA.</p>
+    </div>
+    <div class="ports-band band-dynamic">
+      <span class="band-range">49152 – 65535</span>
+      <span class="band-name">Dynamic</span>
+      <p>Ephemeral source ports — never assigned.</p>
+    </div>
+  </div>
+  <p id="ports-count" class="ports-count muted" aria-live="polite"></p>
   <div class="ports-wrap">
     <table id="ports-table" class="ports-table" aria-label="Port reference table">
       <thead>

@@ -38,8 +38,7 @@
     tdName.textContent = e.n;
     tr.appendChild(tdName);
     var tdCat = document.createElement("td");
-    tdCat.appendChild(badge(CATS[e.c] || e.c,
-      "port-cat" + (e.c === "evil" ? " port-cat-evil" : "")));
+    tdCat.appendChild(badge(CATS[e.c] || e.c, "port-cat port-cat-" + e.c));
     tr.appendChild(tdCat);
     var tdDesc = document.createElement("td");
     tdDesc.className = "port-desc";
