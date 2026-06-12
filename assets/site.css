@@ -964,3 +964,29 @@ pre.mermaid:not([data-processed]) {
 .enc-facts dd { cursor: pointer; transition: background .25s ease; border-radius: 4px; overflow-wrap: anywhere; }
 .enc-facts dd:hover { background: var(--accent-soft); }
 .enc-facts dd.enc-copied { background: var(--accent-soft); }
+
+/* ---------- Port reference ---------- */
+.ports-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: .9rem; }
+.ports-search { flex: 1 1 14rem; }
+.ports-proto { margin-top: 0; }
+.ports-cat { flex: 0 1 auto; width: auto; font-family: var(--font-body); }
+.ports-bands { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.ports-wrap { overflow-x: auto; margin-top: .6rem; }
+.ports-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.ports-table th {
+  text-align: left; font-size: .74rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted); padding: .4rem .6rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: var(--topbar-h); background: var(--bg); z-index: 1;
+}
+.ports-table td { padding: .4rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.port-num { font-family: var(--font-mono); font-weight: 600; }
+.port-proto, .port-name { font-family: var(--font-mono); font-size: .82rem; white-space: nowrap; }
+.port-cat {
+  display: inline-block; font-size: .72rem; padding: .05rem .5rem;
+  border-radius: 999px; border: 1px solid var(--border); color: var(--muted);
+  white-space: nowrap;
+}
+.port-cat-evil { border-color: var(--ctp-red); color: var(--ctp-red); }
+.port-desc { line-height: 1.45; }
+.port-note { display: block; color: var(--muted); font-size: .82rem; }
