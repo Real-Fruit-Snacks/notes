@@ -615,6 +615,8 @@ pre.mermaid:not([data-processed]) {
 .tools-menu > summary {
   list-style: none; cursor: pointer; color: var(--muted); user-select: none;
 }
+.topnav-item { display: inline-flex; align-items: center; gap: .35rem; }
+.topnav-icon { width: 15px; height: 15px; flex: none; }
 .tools-menu > summary::-webkit-details-marker { display: none; }
 .tools-menu > summary::after { content: " ▾"; font-size: .75em; }
 .tools-menu > summary:hover, .tools-menu[open] > summary { color: var(--text); }
