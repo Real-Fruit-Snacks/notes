@@ -462,5 +462,26 @@
     clearTimeout(timer);
     timer = setTimeout(render, 150);
   });
+
+  // ---- one-click examples (escapes, not literals: invisibles in source
+  // are exactly the trap this page exists to expose) ----
+  var EXAMPLES = {
+    // ZWSP inside "password", NBSP, soft hyphen, TAB, and a CRLF line end.
+    hidden: "pass\u200Bword vs password\nA\u00A0B no-break\tC\u00ADD soft hyphen\r\nthe end",
+    // Single-char e-acute vs e + combining accent, astral emoji, ZWJ family.
+    emoji: "caf\u00E9 vs cafe\u0301 \u00B7 \uD83D\uDCA9 \u00B7 \uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67",
+    // Cyrillic a (U+0430) hiding inside a Latin domain name.
+    lookalike: "paypal.com vs p\u0430yp\u0430l.com",
+  };
+  var exampleBtns = document.querySelectorAll(".example-btn[data-example]");
+  for (var ei = 0; ei < exampleBtns.length; ei++) {
+    exampleBtns[ei].addEventListener("click", function () {
+      var ex = EXAMPLES[this.getAttribute("data-example")];
+      if (ex == null) return;
+      clearTimeout(timer);
+      input.value = ex;
+      render();
+    });
+  }
   render();
 })();

@@ -314,5 +314,133 @@
     clearTimeout(timer);
     timer = setTimeout(render, 200);
   });
+
+  // ---- one-click examples (stable dates so verdicts never rot: valid to
+  // 2060, expired 2021, and an .ovpn whose CA expired in 2025 while its
+  // client cert runs to 2060, the classic gotcha the wiki describes) ----
+  var EX_VALID = [
+    "-----BEGIN CERTIFICATE-----",
+    "MIIDTzCCAjegAwIBAgIUQQU2TuBfC7KWTvnNT8wtFrkwbvIwDQYJKoZIhvcNAQEL",
+    "BQAwNjEZMBcGA1UEAwwQZGVtby5leGFtcGxlLm9yZzEZMBcGA1UECgwQTm90ZXMg",
+    "VG9vbHMgRGVtbzAgFw0yNDAxMDEwMDAwMDBaGA8yMDYwMDEwMTAwMDAwMFowNjEZ",
+    "MBcGA1UEAwwQZGVtby5leGFtcGxlLm9yZzEZMBcGA1UECgwQTm90ZXMgVG9vbHMg",
+    "RGVtbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALegw1vpHJxl/CQP",
+    "8Ci6bOJPaq1M5QpIghSlQ4tt7gi0WjsZtAgpHFsE3OLOYHrdkpmheQkmdXvEfv2S",
+    "GQuChtLhN4esM3mYG2f2Qtzv24mASUkRG1dyjO3sNkr2dBylHIDIqK+MTz0KRefk",
+    "7fKFxpkIV1uVOrfOI5g9z/CiR4I3YG7lqNvN4ijvmkWpvAeis9XWtD9iBd5L48Mc",
+    "79CZSLe1NsikHa1QIrzndxKYERpybmeoYiRi30Omg32wIlE4lY16bYhDJ5AtkTXP",
+    "8LrF2NfqeahIGIIpnWdcHUZ+Rfw2ICNWmo+mB5htFlHYYf8UGEUKveA/orcmoZKz",
+    "GEYr9qcCAwEAAaNTMFEwHQYDVR0OBBYEFFec4NV5uquWGdbBkQzLgAE6gF0MMB8G",
+    "A1UdIwQYMBaAFFec4NV5uquWGdbBkQzLgAE6gF0MMA8GA1UdEwEB/wQFMAMBAf8w",
+    "DQYJKoZIhvcNAQELBQADggEBACwInAusflLn09sVCTsIeXYVYKkzOc6OuQujnMkm",
+    "lgLp03xSUepX9o/Mo7P7lvjtdLc6IpjbKmz5mCxYILmEQpzknk+kp9sNW+5jFEdR",
+    "jnKkd/ykLZve/aN1jy/kwzQ/obnlzVL7ufgx0i5+H1LKJvTkIzEUHhWHjzDCXHaq",
+    "zfKj6N7P4tyRCts45X2j7fkf/8ZAw/SJKInC/YfRWDlyNLP14Rt5uV5eNjw3AYze",
+    "RZSJDLLXII2Siu7XxIbA/cUpgEQcWdUBfnBerW8tfDz0Gos73guEjL0ShfFMVpUr",
+    "/bwsNeZbWh2DEwUvEGo0IudRbjlCz163CEvHy1CfepsqAMs=",
+    "-----END CERTIFICATE-----",
+  ].join("\n");
+  var EX_EXPIRED = [
+    "-----BEGIN CERTIFICATE-----",
+    "MIIDIjCCAgqgAwIBAgIUONNLquhfw7SDodXEtnZrJLNr05wwDQYJKoZIhvcNAQEL",
+    "BQAwLTEQMA4GA1UEAwwHRGVtbyBDQTEZMBcGA1UECgwQTm90ZXMgVG9vbHMgRGVt",
+    "bzAeFw0xOTA0MDEwMDAwMDBaFw0yMTA0MDEwMDAwMDBaMBoxGDAWBgNVBAMMD29s",
+    "ZC5leGFtcGxlLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAM/1",
+    "893mkd7nqH1sP+TVBQ4jFmV+sLIPC+B0RvioAOAb6MHDWVPWtBQ/myB6SatYGSfb",
+    "g9ET9VCSJOwmzgXC6ceOof4z1aG2bcrABeUW8S/ldCYFOF34nUNYgrDx1HoF3IgR",
+    "jYIeOHxINfAHihsPSsdR7VOEjAHD4FkmZ5Hu4Zou8dYCaxJTm9i5s2zT0ySEWuyw",
+    "27o7f4rU0uy86kuX7KXOyBAx8KQBuhIaGGL2TmYWf6qLen7pVqHi+WJCCXyMSHY7",
+    "F6Qi+dZ+Pc5YPxHuD/ier3+GClz0rTqLtIYvSvFRoBR0XLh+nB2ONo674wQACnRL",
+    "9Xt7jSNEOWRkN064+RECAwEAAaNNMEswCQYDVR0TBAIwADAdBgNVHQ4EFgQU1y1O",
+    "acWoypb6UqqqudddX1xCOBkwHwYDVR0jBBgwFoAUASaNhYsvJOcJAjtLEte56gN7",
+    "UkIwDQYJKoZIhvcNAQELBQADggEBAGTHQ/JOiP7b/sfljNTSw+Pv5b9nckPHy3L2",
+    "U75rqJafOAZWNnowz23BudOMCA84w0IrwyIY3cIJ5JABwviv8oStkLMXXh65qfc0",
+    "9Ty6xw8yhLsUQJzXSNtM9tVTqwisMTiMDecEV8ksoKHuny4ZRXq/SRogvztNV6uQ",
+    "EY3mPgbJ77uljY64Esifz3SxijB8q/lT9AJlzTeORn8UyDyePUKyvX25zsoOY/Sw",
+    "MS+eTopYv9dUSBtory9vL/B9X/tqPe7z4WVAaMYNGBmjs9zVkWiQOLdlAVEqoAzM",
+    "OmKMcExfTUlAviV7RYhVratZB7vZOceNni6tHyQ2taTFeCVd+xc=",
+    "-----END CERTIFICATE-----",
+  ].join("\n");
+  var EX_VPN_CA = [
+    "-----BEGIN CERTIFICATE-----",
+    "MIIDQzCCAiugAwIBAgIUBlZ6rcDg7OBaE9lEozLu/W6X0XkwDQYJKoZIhvcNAQEL",
+    "BQAwMTEUMBIGA1UEAwwLRGVtbyBWUE4gQ0ExGTAXBgNVBAoMEE5vdGVzIFRvb2xz",
+    "IERlbW8wHhcNMTUwMTAxMDAwMDAwWhcNMjUwMTAxMDAwMDAwWjAxMRQwEgYDVQQD",
+    "DAtEZW1vIFZQTiBDQTEZMBcGA1UECgwQTm90ZXMgVG9vbHMgRGVtbzCCASIwDQYJ",
+    "KoZIhvcNAQEBBQADggEPADCCAQoCggEBAKUEBN03bq1rDSi6eKa1I6BiRIy+STFe",
+    "b9Lob+GQD24Yj9qV/PjIiCmslAOIPQFEMgHZ3XPOqCT4vRxexMAkki4BOHxvZE/O",
+    "eQ+ZeiLHWVepBD5HLAvLRtx1mbqTvMtABpYCAZiufyhfvNKsOrU/J8PPGeoiu4B7",
+    "NOjd7xOqw8AYSACj5hZxL2wjq76A4WyqnMy+XlXtX7mPJiie9Ye/uu+5lpz3rxse",
+    "c9RMGbF4AlL/ImPXEK2a8ebbJ1/hiRYbdPMGDywUep+WnNaFcEOJjKgfZ1VWjiCo",
+    "JJGkfrw9va64ht+Ln/wG38bxDxEOcoBRaRGOJCjMAAa44U0Rqae7POMCAwEAAaNT",
+    "MFEwHQYDVR0OBBYEFAz4UOI7hCFXDPDfX1qwFPtiDnTlMB8GA1UdIwQYMBaAFAz4",
+    "UOI7hCFXDPDfX1qwFPtiDnTlMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL",
+    "BQADggEBAJSeZCNzhdLjKwCW0rcGETmmGxUxNU/ZFDGmG0qq8BeZjZZOgyMlU3gX",
+    "W3JSodMF3XAB2HNk9BQXAQFrEg0w/AUTtW5d4MzkrbF0/sRGprQdnM83lKEkxZez",
+    "QiEY3ZCoStGttn0u3mlOGaKmVOZPDkPIkOMyfa3N4dexasqzeJr4ll5CzHNV2XKz",
+    "tjHGLLC3SCvBpgH2+VFbjZnbOae8Rnsu1UycYykRaHuHlrV3XIcXKjUuYKFUr+P2",
+    "/Hyo4qywmBzHYDAK3EiCm3YwVcJlbg+VT47b9EfzD/eyEA4DpKw1lYfEca9LnLxq",
+    "d4KTwMpmtdFqkRklZjofaxJ5DIwN5is=",
+    "-----END CERTIFICATE-----",
+  ].join("\n");
+  var EX_VPN_CLIENT = [
+    "-----BEGIN CERTIFICATE-----",
+    "MIIDJDCCAgygAwIBAgIUAqdPp73wwwhpO2jUUGWj4blvS8IwDQYJKoZIhvcNAQEL",
+    "BQAwMTEUMBIGA1UEAwwLRGVtbyBWUE4gQ0ExGTAXBgNVBAoMEE5vdGVzIFRvb2xz",
+    "IERlbW8wIBcNMjQwMTAxMDAwMDAwWhgPMjA2MDAxMDEwMDAwMDBaMBYxFDASBgNV",
+    "BAMMC3Zwbi1jbGllbnQxMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA",
+    "jnfdLuOeLTV7r1AX5zNgpq0gJQyWWSKnCkBDUxySAIPXY+PqqDLPxjIVDH5pIjgy",
+    "k5KWtDWIdTOErz6DSUyUz56YW6KrqlFqSiUhYj88gN7G7STMGJ7ikGLRtwBAi5k6",
+    "dccW1byZSP2Xnt+FOGqw+FleK9svIVdomotrtMwPjQ0WdsggYovKEwRpeA8J0i7o",
+    "xXT21pprSAW383S+3yAaosnY/AwmlDYT7eZHdzy+fHfjUdeaIcE84hxsL8uHvJIL",
+    "F14mUtXqAuhHQQNbggqjTqFTJOnk6S5Zcx2EJMa5tC0NjIXzvdy3fl+taObnsRsQ",
+    "CAYrvuXtyF67Y9ddaVlOxQIDAQABo00wSzAJBgNVHRMEAjAAMB0GA1UdDgQWBBS3",
+    "YB41cC7aBxjXiw7oQx4TX0Dl4zAfBgNVHSMEGDAWgBQM+FDiO4QhVwzw319asBT7",
+    "Yg505TANBgkqhkiG9w0BAQsFAAOCAQEAFdXovG4ig8iwUNOYGnc+IbBgdTWiprub",
+    "wVmInkuwmMOMQdWQRRGJg3XUvgPYERbb8hQUp58AfsJXQYR8oHCYg/HK01fQEjsz",
+    "kRxj/dPlo4c+SyhZ5knyUFsLQ3V95motqvEXoPoECDKaRaV2i4UePKCWny1dVE6Y",
+    "pnhHqJlFizrVICj8Iu37nUvOpxGCzr79TCPycX2y98QWHvOh5zJugmBOMH1J95MD",
+    "fUMmka2CtEV0dcKRF6nywnxcwUOKtHp66iWYQ007xTBKJXduMFqw6tW3esRPksY5",
+    "SfzwexlsQD6NSRNgieWCaSRPvks6PKGpYQrxVjyAkVpchf4fQO/qDg==",
+    "-----END CERTIFICATE-----",
+  ].join("\n");
+  var EXAMPLES = {
+    valid: EX_VALID,
+    expired: EX_EXPIRED,
+    ovpn: [
+      "# Demo OpenVPN profile - the certificates are real, parseable",
+      "# examples; the key blocks are fake placeholders.",
+      "client",
+      "dev tun",
+      "proto udp",
+      "remote vpn.example.org 1194",
+      "<ca>",
+      EX_VPN_CA,
+      "</ca>",
+      "<cert>",
+      EX_VPN_CLIENT,
+      "</cert>",
+      "<key>",
+      "-----BEGIN PRIVATE KEY-----",
+      "ZmFrZSBkZW1vIGtleSAtIG5vdCBhIHJlYWwgb25l",
+      "-----END PRIVATE KEY-----",
+      "</key>",
+      "<tls-auth>",
+      "-----BEGIN OpenVPN Static key V1-----",
+      "ZmFrZSBkZW1vIGtleSAtIG5vdCBhIHJlYWwgb25l",
+      "-----END OpenVPN Static key V1-----",
+      "</tls-auth>",
+    ].join("\n"),
+  };
+  var exampleBtns = document.querySelectorAll(".example-btn[data-example]");
+  for (var ei = 0; ei < exampleBtns.length; ei++) {
+    exampleBtns[ei].addEventListener("click", function () {
+      var ex = EXAMPLES[this.getAttribute("data-example")];
+      if (ex == null) return;
+      clearTimeout(timer);
+      input.value = ex;
+      render();
+    });
+  }
   render();
 })();

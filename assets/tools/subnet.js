@@ -272,5 +272,22 @@
     recompute(true);
   });
 
+  // ---- one-click examples ----
+  var EXAMPLES = {
+    lan: "192.168.1.0/24",   // the classic home LAN
+    ten: "10.0.0.0/8",       // the big RFC 1918 block
+    p2p: "172.16.10.5/30",   // a host inside a point-to-point /30
+  };
+  var exampleBtns = document.querySelectorAll(".example-btn[data-example]");
+  for (var ei = 0; ei < exampleBtns.length; ei++) {
+    exampleBtns[ei].addEventListener("click", function () {
+      var ex = EXAMPLES[this.getAttribute("data-example")];
+      if (ex == null) return;
+      clearTimeout(timer);
+      input.value = ex;
+      recompute(false);
+    });
+  }
+
   recompute(false);
 })();
