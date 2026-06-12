@@ -79,6 +79,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/tools/cidr.html" in sitemap
     assert "https://example.com/myrepo/tools/timestamp.html" in sitemap
     assert "https://example.com/myrepo/tools/encoding.html" in sitemap
+    assert "https://example.com/myrepo/tools/ports.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -128,7 +129,7 @@ def test_topbar_has_tools_dropdown(config):
     names = [
         "Certificate Checker", "Character Inspector", "chmod Calculator",
         "CIDR Aggregator", "Cron Parser", "Encoding Playground",
-        "Subnet Calculator", "Timestamp Converter",
+        "Port Reference", "Subnet Calculator", "Timestamp Converter",
     ]
     positions = [html.index(">" + n + "</a>") for n in names]
     assert positions == sorted(positions)
@@ -192,7 +193,7 @@ def test_certs_wikilink_resolves(tmp_path):
 
 def test_tool_example_buttons(config):
     build_site(config)
-    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr", "timestamp", "encoding"):
+    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr", "timestamp", "encoding", "ports"):
         html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
         assert html.count('class="tool-examples"') == 1, page
         assert html.count('class="example-btn"') == 3, page
@@ -344,3 +345,49 @@ def test_encoding_wikilink_resolves(tmp_path):
     assert 'href="/tools/encoding.html"' in html
     assert '<span class="broken-link"' not in html
     assert not any("Encoding" in w for w in warnings)
+
+
+def test_ports_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "ports.html").read_text(encoding="utf-8")
+    assert 'id="ports-search"' in html
+    assert 'id="ports-cat"' in html
+    assert 'id="ports-count"' in html
+    assert 'id="ports-table"' in html
+    assert 'id="ports-wiki"' in html
+    assert "/myrepo/assets/tools/ports.js" in html
+    assert html.count('class="wiki-entry"') == 9
+
+
+def test_ports_json_emitted(config):
+    build_site(config)
+    data = json.loads((config.out / "ports.json").read_text(encoding="utf-8"))
+    ports = {e["p"]: e for e in data["ports"]}
+    assert len(ports) >= 700
+    assert ports[443]["n"] == "https"
+    assert ports[443]["c"] == "web"
+    assert ports[443]["proto"] == "tcp/udp"
+    assert ports[22]["n"] == "ssh"
+    assert ports[22]["proto"] == "tcp"
+    assert ports[53]["c"] == "name"
+    assert ports[31337]["c"] == "evil"
+    cats = set(data["categories"])
+    assert all(e["c"] in cats for e in data["ports"])
+    assert all(e["proto"] in ("tcp", "udp", "tcp/udp") for e in data["ports"])
+
+
+def test_ports_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Port Reference]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/ports.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Port" in w for w in warnings)

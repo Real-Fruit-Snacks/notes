@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .discover import slugify
 from .models import Note, SiteConfig
 from .text import plain_text
+from .ports import ports_json
 from .unicode_names import name_table
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
@@ -162,6 +163,9 @@ class Renderer:
         enc_tpl = self.env.get_template("tools/encoding.html")
         pages["tools/encoding.html"] = enc_tpl.render(nav=nav)
 
+        ports_tpl = self.env.get_template("tools/ports.html")
+        pages["tools/ports.html"] = ports_tpl.render(nav=nav)
+
         pages["404.html"] = self.env.get_template("404.html").render(nav=nav)
 
         pages["site.webmanifest"] = json.dumps({
@@ -188,6 +192,7 @@ class Renderer:
         pages["search.json"] = json.dumps(self._search_index(notes))
         pages["excerpts.json"] = json.dumps(self._excerpts(notes))
         pages["unicode-names.json"] = json.dumps(name_table(), separators=(",", ":"))
+        pages["ports.json"] = ports_json()
         return pages
 
     def _search_index(self, notes: list[Note]) -> list[dict]:
@@ -224,6 +229,7 @@ class Renderer:
             self.config.abs_url("tools/cidr.html"),
             self.config.abs_url("tools/timestamp.html"),
             self.config.abs_url("tools/encoding.html"),
+            self.config.abs_url("tools/ports.html"),
         ]
         urls += [self.config.abs_url(f"tags/{slugify(t)}.html") for t in tags]
         urls = [u for u in urls if u]  # only when site_url is configured

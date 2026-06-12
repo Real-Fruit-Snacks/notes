@@ -23,6 +23,7 @@ RESERVED_PAGES = {
     "cidr aggregator": "tools/cidr",
     "timestamp converter": "tools/timestamp",
     "encoding playground": "tools/encoding",
+    "port reference": "tools/ports",
 }
 
 

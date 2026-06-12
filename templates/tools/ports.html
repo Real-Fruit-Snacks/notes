@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/ports.html" %}
+{% block title %}Port Reference · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Port Reference</h1>
+  <p class="muted">Every assigned well-known port plus the registered ones
+  worth knowing — searchable by number, service, or keyword, with the
+  transport each port <em>actually</em> uses, a category, and the stories
+  behind the notorious ones.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <div class="ports-controls">
+    <input type="text" id="ports-search" class="subnet-input ports-search"
+      placeholder="443, ssh, database, rdp…" autocomplete="off"
+      autocapitalize="off" spellcheck="false" aria-label="Search ports">
+    <div class="enc-modes ports-proto" role="group" aria-label="Transport filter">
+      <button type="button" class="mode-btn" data-proto="all" aria-pressed="true">All</button>
+      <button type="button" class="mode-btn" data-proto="tcp" aria-pressed="false">TCP</button>
+      <button type="button" class="mode-btn" data-proto="udp" aria-pressed="false">UDP</button>
+    </div>
+    <select id="ports-cat" class="subnet-input ports-cat" aria-label="Category filter">
+      <option value="all">All categories</option>
+    </select>
+  </div>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="https">443</button>
+    <button type="button" class="example-btn" data-example="rdp">3389 (RDP)</button>
+    <button type="button" class="example-btn" data-example="redis">redis</button>
+  </div>
+  <dl class="subnet-facts ports-bands">
+    <div class="fact"><dt>0–1023</dt><dd>well-known · root/admin to bind (traditionally)</dd></div>
+    <div class="fact"><dt>1024–49151</dt><dd>registered · first-come listings with IANA</dd></div>
+    <div class="fact"><dt>49152–65535</dt><dd>dynamic · ephemeral source ports, never assigned</dd></div>
+  </dl>
+  <p id="ports-count" class="char-notice" aria-live="polite"></p>
+  <div class="ports-wrap">
+    <table id="ports-table" class="ports-table" aria-label="Port reference table">
+      <thead>
+        <tr><th scope="col">Port</th><th scope="col">Proto</th><th scope="col">Service</th>
+            <th scope="col">Category</th><th scope="col">Description</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <section class="tool-wiki" id="ports-wiki">
+    <h2>Understanding ports</h2>
+    <details class="wiki-entry">
+      <summary>What a port actually is</summary>
+      <p>A 16-bit number (0–65535) that lets one IP address host many
+      conversations: a connection is the four-tuple of source IP + source
+      port + destination IP + destination port. The numbers in this table
+      are conventions about <em>destinations</em> — who's expected to be
+      listening — nothing in TCP/IP enforces them.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The three ranges</summary>
+      <p>IANA splits the space in three: <strong>well-known</strong> (0–1023,
+      the table's bulk, standardized services), <strong>registered</strong>
+      (1024–49151, first-come registrations from vendors), and
+      <strong>dynamic</strong> (49152–65535, never assigned — reserved for
+      ephemeral use). Registration is paperwork, not protection: anything can
+      listen anywhere.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>TCP, UDP, or both?</summary>
+      <p>IANA registers almost every name for both transports, but reality
+      picks one: SSH is TCP, NTP and DHCP are UDP. The table shows the
+      transport each service <em>actually</em> speaks. The interesting cases
+      genuinely use both — DNS (UDP queries, TCP zone transfers), RDP (UDP
+      for graphics since 8.0), and 443 (TCP for HTTPS, UDP for HTTP/3's
+      QUIC).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Privileged ports</summary>
+      <p>Unix tradition: binding below 1024 requires root, so a connecting
+      client could "trust" the daemon was admin-installed. Containers,
+      <code>CAP_NET_BIND_SERVICE</code>, and Windows (which never had the
+      rule) eroded that story — modern Linux even lets you lower the
+      threshold with a sysctl. Treat it as history, not security.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Ephemeral ports</summary>
+      <p>Your side of a connection gets a temporary source port from the
+      dynamic range — but OSes disagree on its bounds: IANA says
+      49152–65535, Linux defaults to 32768–60999, and Windows since Vista
+      follows IANA. It matters when you're writing firewall rules for return
+      traffic, or wondering why <code>traceroute</code> probes UDP 33434 and
+      up.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Port 0</summary>
+      <p>Reserved everywhere and unroutable in practice: in the sockets API,
+      binding to 0 means "give me any free port". Packets with source or
+      destination 0 in the wild are almost always crafted — many IDS rules
+      flag them on sight.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Registered ≠ what's running</summary>
+      <p>The registry says 8080 is "http-alt" — in the wild it's Tomcat,
+      proxies, and a million dev servers. 2222 is officially EtherNet/IP-2
+      but practically alternate SSH; 10000 is NDMP on paper and Webmin in
+      practice. Nothing stops a service from squatting any number, which is
+      why scanners fingerprint <em>banners</em>, not numbers.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The notorious numbers</summary>
+      <p>Some ports are famous for the wrong reasons: <strong>31337</strong>
+      ("elite") was Back Orifice's backdoor, <strong>12345</strong> was
+      NetBus, <strong>4444</strong> is Metasploit's default listener, and
+      <strong>1337</strong> is wherever leetspeak lands. Finding one
+      listening doesn't prove compromise — but it's always worth asking what
+      put it there.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The amplification list</summary>
+      <p>UDP services that answer small questions with big responses get
+      abused for reflected DDoS: chargen (19), DNS (53), NTP (123), SNMP
+      (161), SSDP (1900), and memcached (11211 — 2018's record 1.7 Tbps
+      attack). If you run any of these, rate-limit them, disable the
+      amplifying queries, and never expose them to the open internet.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/ports.js"></script>
+{% endblock %}
