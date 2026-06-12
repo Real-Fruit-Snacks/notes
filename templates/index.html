@@ -1,36 +1,73 @@
 {% extends "base.html" %}
 {% set canonical_path = "index.html" %}
 {% block content %}
-<article class="note">
+<article class="note home">
   <h1 class="note-title">{{ site_title }}</h1>
-  <p class="muted">{{ notes | length }} published note{{ "s" if notes | length != 1 }}.
-    Explore the <a href="{{ base_url }}graph.html">graph</a> or browse below.</p>
+  <p class="muted home-lede">{{ notes | length }} published note{{ "s" if notes | length != 1 }}
+    · {{ all_tags | length }} tag{{ "s" if all_tags | length != 1 }}
+    · {{ TOOLS | length }} tools
+    · <a href="{{ base_url }}graph.html">graph view</a></p>
 
-  {% if all_tags %}
-  <div class="tag-chips">
-    {% for tag in all_tags %}
-    <a class="tag-chip" href="{{ base_url }}tags/{{ tag | slugify }}.html">{{ tag }}</a>
+  <h2 class="index-heading">Tools</h2>
+  <div class="home-tools">
+    {% for href, name, blurb, key in TOOLS %}
+    <a class="home-tool" href="{{ base_url }}{{ href }}">
+      {{ tool_icon(key, "home-tool-icon") }}
+      <span class="home-tool-name">{{ name }}</span>
+      <span class="home-tool-blurb muted">{{ blurb }}</span>
+    </a>
     {% endfor %}
   </div>
-  {% endif %}
 
   {% if recent %}
   <h2 class="index-heading">Recently updated</h2>
-  <ul class="note-list recent-list">
+  <ul class="home-recent">
     {% for n in recent %}
     <li>
-      <a href="{{ base_url }}{{ n.url }}">{{ n.title }}</a>
+      <a class="home-recent-link" href="{{ base_url }}{{ n.url }}">
+        <span class="home-recent-title">{{ n.title }}</span>
+        {% if n.description %}<span class="home-recent-excerpt muted">{{ n.description }}</span>{% endif %}
+      </a>
       <span class="note-date">{{ n.updated[:10] }}</span>
     </li>
     {% endfor %}
   </ul>
   {% endif %}
 
-  <h2 class="index-heading">All notes</h2>
-  <ul class="note-list">
-    {% for n in notes %}
-    <li><a href="{{ base_url }}{{ n.url }}">{{ n.title }}</a></li>
+  <h2 class="index-heading">Browse</h2>
+  <div class="home-folders">
+    {% for item in nav if item.type == "folder" %}
+    <div class="home-folder">
+      <h3>{{ item.name }}</h3>
+      <ul>
+        {%- for c in item.children recursive %}
+        {%- if c.type == "note" %}
+        <li><a href="{{ base_url }}{{ c.url }}">{{ c.name }}</a></li>
+        {%- else %}{{ loop(c.children) }}{% endif %}
+        {%- endfor %}
+      </ul>
+    </div>
     {% endfor %}
-  </ul>
+    {% set rootnotes = nav | selectattr("type", "equalto", "note") | list %}
+    {% if rootnotes %}
+    <div class="home-folder">
+      <h3>Notes</h3>
+      <ul>
+        {% for c in rootnotes %}
+        <li><a href="{{ base_url }}{{ c.url }}">{{ c.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if all_tags %}
+  <h2 class="index-heading">Tags</h2>
+  <div class="tag-chips">
+    {% for tag in all_tags %}
+    <a class="tag-chip" href="{{ base_url }}tags/{{ tag | slugify }}.html">{{ tag }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
 </article>
 {% endblock %}

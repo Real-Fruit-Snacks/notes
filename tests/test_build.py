@@ -48,6 +48,21 @@ def test_pocket_bird_vendored(config):
     assert "prefers-reduced-motion" in html
 
 
+def test_homepage_sections(config):
+    build_site(config)
+    html = (config.out / "index.html").read_text(encoding="utf-8")
+    # Tool grid: one card per registry entry, icons distinct from the menu's.
+    assert html.count('class="home-tool"') == 9
+    assert html.count('class="home-tool-icon"') == 9
+    assert "Recently updated" in html
+    assert 'class="home-recent"' in html
+    # Excerpts must actually render (a wrong Note attr fails silently in Jinja).
+    assert 'class="home-recent-excerpt' in html
+    assert ">Browse</h2>" in html
+    assert 'class="home-folder"' in html
+    assert ">Tags</h2>" in html
+
+
 def test_search_and_graph_json(config):
     build_site(config)
     out = config.out
