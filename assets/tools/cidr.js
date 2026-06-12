@@ -240,7 +240,8 @@
       list.push(cidrOf(n));
       var extra = [
         { text: intToIp(maskOf(n.prefix)) },
-        { text: sizeOf(n.prefix).toLocaleString() + " addresses" },
+        { text: sizeOf(n.prefix).toLocaleString() +
+          (sizeOf(n.prefix) > 1 ? " addresses" : " address") },
       ];
       if (n.inputs > 1) extra.push({ text: "← " + n.inputs + " inputs", fill: true });
       resultsEl.appendChild(row(n, extra));
@@ -313,7 +314,7 @@
     navigator.clipboard.writeText(lastList + "\n").then(function () {
       copyBtn.textContent = "Copied ✓";
       setTimeout(function () { copyBtn.textContent = "Copy list"; }, 1500);
-    });
+    }).catch(function () { /* clipboard unavailable (permissions/focus) */ });
   });
 
   // ---- one-click examples ----
