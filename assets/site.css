@@ -821,21 +821,28 @@ pre.mermaid:not([data-processed]) {
 }
 .examples-label { font-size: .8rem; }
 .example-btn,
-.copy-list-btn {
+.copy-list-btn,
+.mode-btn {
   cursor: pointer; font: inherit; font-size: .8rem;
   padding: .25rem .7rem; border-radius: 999px;
   color: var(--text); background: var(--bg-alt); border: 1px solid var(--border);
   transition: color .15s ease, border-color .15s ease;
 }
 .example-btn:hover,
-.copy-list-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-list-btn:hover,
+.mode-btn:hover { color: var(--accent); border-color: var(--accent); }
+.mode-btn[aria-pressed="true"] {
+  color: var(--accent); border-color: var(--accent);
+  background: var(--accent-soft);
+}
 
 /* ---------- Cron parser ---------- */
 .cron-input { width: 100%; }
 .cron-desc,
 .chmod-desc,
 .cidr-desc,
-.ts-desc {
+.ts-desc,
+.enc-desc {
   font-size: 1.15rem; font-weight: 600; line-height: 1.5;
   margin: 1.25rem 0 0; padding: .8rem 1rem;
   background: var(--bg-alt); border: 1px solid var(--border);
@@ -947,3 +954,13 @@ pre.mermaid:not([data-processed]) {
 .ts-facts dd { cursor: pointer; transition: background .25s ease; border-radius: 4px; }
 .ts-facts dd:hover { background: var(--accent-soft); }
 .ts-facts dd.ts-copied { background: var(--accent-soft); }
+
+/* ---------- Encoding playground ---------- */
+.enc-modes {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+  margin-top: .6rem;
+}
+.enc-facts { grid-template-columns: 1fr; }
+.enc-facts dd { cursor: pointer; transition: background .25s ease; border-radius: 4px; overflow-wrap: anywhere; }
+.enc-facts dd:hover { background: var(--accent-soft); }
+.enc-facts dd.enc-copied { background: var(--accent-soft); }
