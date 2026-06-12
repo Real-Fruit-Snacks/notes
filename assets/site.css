@@ -977,7 +977,6 @@ pre.mermaid:not([data-processed]) {
   text-align: left; font-size: .74rem; text-transform: uppercase;
   letter-spacing: .05em; color: var(--muted); padding: .4rem .6rem;
   border-bottom: 1px solid var(--border);
-  position: sticky; top: var(--topbar-h); background: var(--bg); z-index: 1;
 }
 .ports-table td { padding: .4rem .6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
 .port-num { font-family: var(--font-mono); font-weight: 600; }
