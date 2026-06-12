@@ -170,11 +170,17 @@
   }
 
   // ---- rendering ----
-  function factRow(label, value, full) {
+  function factRow(label, value, full, lenText) {
     var wrap = document.createElement("div");
     wrap.className = "fact";
     var t = document.createElement("dt");
-    t.textContent = label;
+    t.appendChild(document.createTextNode(label));
+    if (lenText) {
+      var len = document.createElement("span");
+      len.className = "enc-len";
+      len.textContent = lenText;
+      t.appendChild(len);
+    }
     var d = document.createElement("dd");
     d.textContent = value;
     if (full !== undefined) d.setAttribute("data-copy", full);
@@ -184,11 +190,26 @@
     return wrap;
   }
 
-  function capped(label, full) {
-    if (full.length <= DISPLAY_CAP) return factRow(label, full);
+  function capped(label, full, lenText) {
+    if (full.length <= DISPLAY_CAP) return factRow(label, full, undefined, lenText);
     return factRow(label,
       full.slice(0, DISPLAY_CAP) + " … (+" + (full.length - DISPLAY_CAP).toLocaleString() +
-      " more characters - click copies everything)", full);
+      " more characters - click copies everything)", full, lenText);
+  }
+
+  function group(text) {
+    var div = document.createElement("div");
+    div.className = "enc-group";
+    div.textContent = text;
+    return div;
+  }
+
+  function countChars(s) {
+    var chars = 0;
+    for (var i = 0; i < s.length; chars++) {
+      i += s.codePointAt(i) > 0xFFFF ? 2 : 1;
+    }
+    return chars;
   }
 
   var mode = "text";
@@ -228,17 +249,28 @@
     descEl.hidden = false;
 
     var b64 = b64Encode(bytes);
+    var b64u = b64UrlOf(b64);
+    var url = urlEncode(bytes);
     tableEl.appendChild(capped(
-      "Text · UTF-8" + (decoded.lossy ? " (invalid bytes → �)" : ""), decoded.text));
-    tableEl.appendChild(capped("Base64", b64));
-    tableEl.appendChild(capped("Base64url", b64UrlOf(b64)));
-    tableEl.appendChild(capped("URL-encoded", urlEncode(bytes)));
-    tableEl.appendChild(capped("Hex", hexEncode(bytes)));
-    tableEl.appendChild(capped("Binary", binEncode(bytes)));
+      "Text · UTF-8" + (decoded.lossy ? " (invalid bytes → �)" : ""), decoded.text,
+      countChars(decoded.text) + " chars"));
+    tableEl.appendChild(group("Encodings"));
+    tableEl.appendChild(capped("Base64", b64, b64.length + " chars"));
+    tableEl.appendChild(capped("Base64url", b64u, b64u.length + " chars"));
+    tableEl.appendChild(capped("URL-encoded", url, url.length + " chars"));
+    tableEl.appendChild(capped("Hex", hexEncode(bytes),
+      bytes.length.toLocaleString() + (bytes.length === 1 ? " byte" : " bytes")));
+    tableEl.appendChild(capped("Binary", binEncode(bytes),
+      (bytes.length * 8).toLocaleString() + " bits"));
 
+    tableEl.appendChild(group("Fingerprints"));
     var hasCrypto = typeof crypto !== "undefined" && crypto.subtle;
-    var sha256Row = factRow("SHA-256", hasCrypto ? "computing…" : "unavailable (needs a secure context)");
-    var sha512Row = factRow("SHA-512", hasCrypto ? "computing…" : "unavailable (needs a secure context)");
+    var sha256Row = factRow("SHA-256",
+      hasCrypto ? "computing…" : "unavailable (needs a secure context)",
+      undefined, "64 hex digits");
+    var sha512Row = factRow("SHA-512",
+      hasCrypto ? "computing…" : "unavailable (needs a secure context)",
+      undefined, "128 hex digits");
     tableEl.appendChild(sha256Row);
     tableEl.appendChild(sha512Row);
     if (hasCrypto) {

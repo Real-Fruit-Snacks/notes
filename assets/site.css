@@ -985,10 +985,35 @@ pre.mermaid:not([data-processed]) {
   display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
   margin-top: .6rem;
 }
-.enc-facts { grid-template-columns: 1fr; }
-.enc-facts dd { cursor: pointer; transition: background .25s ease; border-radius: 4px; overflow-wrap: anywhere; }
+.enc-facts { grid-template-columns: 1fr; gap: .55rem; }
+.enc-facts .fact { display: block; }
+.enc-facts dt {
+  display: flex; align-items: baseline; gap: .6rem;
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: .3rem;
+}
+.enc-facts .enc-len {
+  color: var(--muted); text-transform: none; letter-spacing: normal;
+  font-family: var(--font-mono);
+}
+.enc-facts dt::after {
+  content: "click to copy"; margin-left: auto; opacity: 0;
+  transition: opacity .15s ease; color: var(--muted);
+  text-transform: none; letter-spacing: normal;
+}
+.enc-facts .fact:hover dt::after { opacity: 1; }
+.enc-facts dd {
+  margin: 0 -.25rem 0; padding: .1rem .25rem; text-align: left;
+  font-family: var(--font-mono); font-size: .9rem; line-height: 1.55;
+  cursor: pointer; border-radius: 4px; overflow-wrap: anywhere;
+  transition: background .25s ease;
+}
 .enc-facts dd:hover { background: var(--accent-soft); }
 .enc-facts dd.enc-copied { background: var(--accent-soft); }
+.enc-group {
+  font-size: .72rem; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--muted); margin: .7rem 0 -.1rem; padding-left: .15rem;
+}
 
 /* ---------- Port reference ---------- */
 .ports-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: .9rem; }
