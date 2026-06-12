@@ -13,6 +13,9 @@
   var fieldsEl = document.getElementById("cron-fields");
   var runsEl = document.getElementById("cron-runs");
   var outputEl = document.getElementById("cron-output");
+  var exprEl = document.getElementById("cron-expr");
+
+  var SEG_LABELS = ["minute", "hour", "day (month)", "month", "day (week)"];
 
   var RUN_COUNT = 10;
   var SCAN_DAYS = 366 * 5; // enough to reach a Feb-29-only schedule
@@ -324,10 +327,12 @@
 
   // ---- rendering ----
   // opts.raw renders the raw field text as a code chip in the label;
-  // opts.wide spans the row across the whole facts grid.
+  // opts.wide spans the row across the whole facts grid; opts.cls adds the
+  // per-field color class tying the legend row to its expression segment.
   function factRow(label, dd, opts) {
     var wrap = document.createElement("div");
-    wrap.className = "fact" + (opts && opts.wide ? " fact-wide" : "");
+    wrap.className = "fact" + (opts && opts.wide ? " fact-wide" : "") +
+      (opts && opts.cls ? " " + opts.cls : "");
     var t = document.createElement("dt");
     t.appendChild(document.createTextNode(label));
     if (opts && opts.raw) {
@@ -340,11 +345,6 @@
     wrap.appendChild(t);
     wrap.appendChild(d);
     return wrap;
-  }
-
-  function fmtRun(d) {
-    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) +
-      " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
   }
 
   function humanDelta(ms) {
@@ -381,18 +381,38 @@
     if (res.reboot) {
       descEl.textContent = "At every system boot — @reboot has no calendar schedule.";
       fieldsEl.hidden = true;
+      exprEl.hidden = true;
       runsEl.appendChild(mutedLi("Runs once at boot; there are no times to project."));
       return;
     }
     fieldsEl.hidden = false;
     descEl.textContent = describe(res);
 
+    // The expression anatomy: five color-coded segments with tiny captions.
+    exprEl.textContent = "";
+    var tokens = res.expanded.split(/\s+/);
+    for (var t = 0; t < 5; t++) {
+      var seg = document.createElement("span");
+      seg.className = "seg";
+      var val = document.createElement("span");
+      val.className = "seg-val seg-" + t;
+      val.textContent = tokens[t];
+      var cap = document.createElement("span");
+      cap.className = "seg-label";
+      cap.textContent = SEG_LABELS[t];
+      seg.appendChild(val);
+      seg.appendChild(cap);
+      exprEl.appendChild(seg);
+    }
+    exprEl.hidden = false;
+
     if (res.expanded !== input.value.trim()) {
       fieldsEl.appendChild(factRow("Expands to", res.expanded, { wide: true }));
     }
     for (var i = 0; i < 5; i++) {
       fieldsEl.appendChild(factRow(
-        FIELDS[i].label, meaning(i, res.fields[i]), { raw: res.fields[i].raw }));
+        FIELDS[i].label, meaning(i, res.fields[i]),
+        { raw: res.fields[i].raw, cls: "cron-field-" + i }));
     }
     var domF = res.fields[2], dowF = res.fields[4];
     var domTrivial = kindOf(domF).kind === "every";
@@ -407,21 +427,35 @@
 
     var now = new Date();
     var runs = nextRuns(res, now, RUN_COUNT);
+    var prevDate = null;
     for (var r = 0; r < runs.length; r++) {
+      var d = runs[r];
+      var dateStr = d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
       var li = document.createElement("li");
       if (r === 0) li.className = "run-next";
-      var when = document.createElement("span");
-      when.className = "run-when";
-      when.textContent = fmtRun(runs[r]);
-      li.appendChild(when);
+      if (prevDate !== null && dateStr !== prevDate) li.classList.add("run-newday");
+      prevDate = dateStr;
+      var dateSpan = document.createElement("span");
+      dateSpan.className = "run-date";
+      dateSpan.textContent = dateStr;
+      li.appendChild(dateSpan);
+      var timeSpan = document.createElement("span");
+      timeSpan.className = "run-time";
+      timeSpan.textContent = pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+      li.appendChild(timeSpan);
+      var dow = d.getDay();
       var dowChip = document.createElement("span");
-      dowChip.className = "run-dow";
-      dowChip.textContent = DOW_NAMES[runs[r].getDay()];
+      dowChip.className = "run-dow" + (dow === 0 || dow === 6 ? " run-dow-we" : "");
+      dowChip.textContent = DOW_NAMES[dow];
       li.appendChild(dowChip);
       if (r === 0) {
+        var badge = document.createElement("span");
+        badge.className = "run-next-badge";
+        badge.textContent = "next";
+        li.appendChild(badge);
         var delta = document.createElement("span");
         delta.className = "run-delta";
-        delta.textContent = humanDelta(runs[r].getTime() - now.getTime());
+        delta.textContent = humanDelta(d.getTime() - now.getTime());
         li.appendChild(delta);
       }
       runsEl.appendChild(li);
