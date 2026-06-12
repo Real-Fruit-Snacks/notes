@@ -20,6 +20,7 @@ RESERVED_PAGES = {
     "certificate checker": "tools/certs",
     "cron parser": "tools/cron",
     "chmod calculator": "tools/chmod",
+    "cidr aggregator": "tools/cidr",
 }
 
 

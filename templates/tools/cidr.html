@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/cidr.html" %}
+{% block title %}CIDR Aggregator · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">CIDR Aggregator</h1>
+  <p class="muted">Paste a messy list of networks — CIDRs, bare IPs, dotted
+  masks, <code>#</code> comments — and get the <strong>minimal exact covering
+  set</strong>: duplicates dropped, contained blocks absorbed, adjacent
+  siblings merged. No extra addresses, ever.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <textarea id="cidr-input" class="char-input" rows="8"
+    placeholder="192.168.0.0/24&#10;192.168.1.0/24&#10;10.0.0.5&#10;172.16.0.0 255.240.0.0&#10;# comments are fine"
+    autocomplete="off" autocapitalize="off" spellcheck="false"
+    aria-label="Networks to aggregate"></textarea>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="merge">Four /24s + noise</button>
+    <button type="button" class="example-btn" data-example="trap">Can't-merge pair</button>
+    <button type="button" class="example-btn" data-example="branches">Branch summary</button>
+  </div>
+  <p id="cidr-error" class="subnet-error" hidden aria-live="polite"></p>
+  <p id="cidr-notice" class="char-notice" hidden aria-live="polite"></p>
+  <div id="cidr-output">
+    <p id="cidr-desc" class="cidr-desc" aria-live="polite" hidden></p>
+    <div class="cidr-results-head" hidden>
+      <h2>Aggregates</h2>
+      <button type="button" id="cidr-copy" class="copy-list-btn">Copy list</button>
+    </div>
+    <ol id="cidr-results" class="cidr-results"></ol>
+    <p id="cidr-placeholder" class="char-placeholder muted">Paste networks above to aggregate them.</p>
+  </div>
+
+  <h2 class="cidr-split-title">Split a network</h2>
+  <p class="muted">The reverse direction: carve one block into equal children
+  — each extra prefix bit doubles the count and halves the size.</p>
+  <div class="chmod-inputs">
+    <label class="chmod-field">
+      <span class="muted">Network</span>
+      <input type="text" id="split-net" class="subnet-input split-net" value="192.168.1.0/24"
+        autocomplete="off" autocapitalize="off" spellcheck="false"
+        aria-label="Network to split">
+    </label>
+    <label class="chmod-field">
+      <span class="muted">into /</span>
+      <input type="number" id="split-prefix" class="subnet-input split-prefix" value="26"
+        min="0" max="32" aria-label="Child prefix length">
+    </label>
+  </div>
+  <p id="split-error" class="subnet-error" hidden aria-live="polite"></p>
+  <p id="split-notice" class="char-notice" hidden aria-live="polite"></p>
+  <ol id="split-results" class="cidr-results"></ol>
+
+  <section class="tool-wiki" id="cidr-wiki">
+    <h2>Understanding aggregation</h2>
+    <details class="wiki-entry">
+      <summary>Aggregation is subnetting in reverse</summary>
+      <p>Subnetting carves one block into many; aggregation (supernetting)
+      notices that many blocks are really one. Routers care because every
+      route is a row in a table consulted for every packet — advertising
+      <code>10.0.0.0/13</code> instead of eight <code>/16</code>s is the
+      entire reason CIDR replaced classful addressing in 1993.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>When two networks can merge</summary>
+      <p>Two blocks merge only when they're <strong>siblings</strong>: the
+      same size, side by side, and the pair starts on the parent's boundary.
+      <code>192.168.0.0/24</code> + <code>192.168.1.0/24</code> →
+      <code>192.168.0.0/23</code> ✓. But <code>192.168.1.0/24</code> +
+      <code>192.168.2.0/24</code> can <em>not</em> merge — they're adjacent,
+      yet <code>192.168.1.0/23</code> would have to start at an even third
+      octet. Adjacency isn't enough; alignment is everything.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Blocks only exist at aligned addresses</summary>
+      <p>A <code>/23</code> holds 512 addresses, so it can only start at a
+      multiple of 512: <code>.0</code>, <code>.2.0</code>, <code>.4.0</code>…
+      That's why this page silently rounds <code>10.0.0.5/8</code> down to
+      <code>10.0.0.0/8</code> (and tells you), and why the splitter's
+      children always land on neat boundaries.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Containment</summary>
+      <p>A block swallows every smaller block inside it:
+      <code>10.0.0.0/16</code> contains <code>10.0.42.0/24</code>, so listing
+      both is redundant and this tool keeps only the big one. (On a real
+      router the more-specific route would <em>win</em> — longest-prefix
+      match — which is exactly why stray specifics in a table deserve a
+      second look.)</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Exact vs lossy summarization</summary>
+      <p>This page is <strong>exact</strong>: the output covers precisely the
+      addresses you pasted. Network engineers often summarize
+      <em>lossily</em> on purpose — advertising one <code>/13</code> for
+      blocks that don't quite fill it trades a smaller, stabler table for
+      claiming space you don't use (and quietly blackholing it). Know which
+      one you're doing.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Splitting a network</summary>
+      <p>Each bit moved from host to prefix doubles the subnets and halves
+      their size: a <code>/24</code> splits into 2 <code>/25</code>s, 4
+      <code>/26</code>s, 8 <code>/27</code>s… Every child loses 2 usable
+      addresses to its own network and broadcast (the <code>/31</code> and
+      <code>/32</code> exceptions are covered on the Subnet Calculator), so
+      finer carving costs more overhead.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Bare IPs and dotted masks</summary>
+      <p>A line like <code>10.0.0.5</code> is treated as the single address
+      <code>10.0.0.5/32</code>. Router-config styles work too:
+      <code>172.16.0.0 255.240.0.0</code> and
+      <code>172.16.0.0/255.240.0.0</code> both mean
+      <code>172.16.0.0/12</code> — the mask must be contiguous ones.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The blocks people actually paste</summary>
+      <p>The RFC 1918 private space: <code>10.0.0.0/8</code>,
+      <code>172.16.0.0/12</code> (the often-fat-fingered one — it ends at
+      <code>172.31.255.255</code>, not <code>172.99</code>…), and
+      <code>192.168.0.0/16</code>. Plus <code>100.64.0.0/10</code> (carrier
+      NAT), <code>169.254.0.0/16</code> (link-local), and
+      <code>0.0.0.0/0</code> — "everything", the default route.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/cidr.js"></script>
+{% endblock %}
