@@ -408,15 +408,16 @@ pre.highlight[data-lang]:not([data-lang=""])::before {
   color: var(--text); cursor: pointer; padding: .3rem;
 }
 .theme-toggle:hover { background: var(--accent-soft); }
-/* Both icons share the grid cell; data-theme picks which one shows.
-   Dark shows the sun (click for light), light shows the moon. */
+/* Both icons share the grid cell; data-theme picks which one shows. The icon
+   is the current theme's mascot: cat on Catppuccin (default dark), moon on
+   Tokyo Night (the "light" slot). The moon spins in; the cat only scales. */
 .theme-toggle svg {
   grid-area: 1 / 1; width: 1.05rem; height: 1.05rem;
   transition: opacity .2s ease, transform .3s ease;
 }
 .theme-toggle .icon-moon { opacity: 0; transform: rotate(90deg) scale(.5); }
 [data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: none; }
-[data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(-90deg) scale(.5); }
+[data-theme="light"] .theme-toggle .icon-cat { opacity: 0; transform: scale(.5); }
 .scrim {
   position: fixed; inset: 0; z-index: 15;
   background: var(--scrim-bg);

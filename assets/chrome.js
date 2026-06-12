@@ -31,7 +31,7 @@
   });
 
   // Theme toggle: persists to localStorage; the head boot script applied the
-  // initial value and CSS swaps the sun/moon icon off data-theme. Both themes
+  // initial value and CSS swaps the cat/moon icon off data-theme. Both themes
   // are dark — "dark" is Catppuccin Mocha, "light" is the legacy storage key
   // for Tokyo Night. Dispatches "themechange" so canvases (graph) can recolour.
   var themeBtn = document.getElementById("theme-toggle");

@@ -21,7 +21,7 @@ of content below.
 ![[diagram.svg]]
 
 > [!tip] Try it out
-> Use the search box in the top bar, switch themes with the sun/moon button,
+> Use the search box in the top bar, switch themes with the cat/moon button,
 > and open the **Graph** to see how these notes connect.
 
 See [[About this site]] for how this is built.
