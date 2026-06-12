@@ -166,3 +166,12 @@ def test_certs_wikilink_resolves(tmp_path):
     assert 'href="/tools/certs.html"' in html
     assert '<span class="broken-link"' not in html
     assert not any("Certificate" in w for w in warnings)
+
+
+def test_tool_example_buttons(config):
+    build_site(config)
+    for page in ("characters", "subnet", "certs"):
+        html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
+        assert html.count('class="tool-examples"') == 1, page
+        assert html.count('class="example-btn"') == 3, page
+        assert 'data-example="' in html, page

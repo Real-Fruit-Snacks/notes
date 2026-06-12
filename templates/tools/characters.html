@@ -12,6 +12,12 @@
   <textarea id="char-input" class="char-input" rows="6"
     placeholder="Paste or type text to inspect…" aria-label="Text to inspect"
     autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="hidden">Hidden characters</button>
+    <button type="button" class="example-btn" data-example="emoji">Emoji &amp; accents</button>
+    <button type="button" class="example-btn" data-example="lookalike">Look-alike letters</button>
+  </div>
   <p id="char-summary" class="char-summary" aria-live="polite"></p>
   <p id="char-notice" class="char-notice" hidden></p>
   <div id="char-detail" class="char-detail" aria-live="polite" aria-atomic="true" hidden></div>

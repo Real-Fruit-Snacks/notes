@@ -11,6 +11,12 @@
     placeholder="Paste a PEM certificate or .ovpn config…"
     autocomplete="off" autocapitalize="off" spellcheck="false"
     aria-label="Certificate or config to inspect"></textarea>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="valid">Valid cert</button>
+    <button type="button" class="example-btn" data-example="expired">Expired cert</button>
+    <button type="button" class="example-btn" data-example="ovpn">Whole .ovpn file</button>
+  </div>
   <p class="muted cert-privacy">Runs entirely in your browser — nothing you
   paste is uploaded anywhere. Private-key blocks are ignored and never
   displayed.</p>
