@@ -323,11 +323,18 @@
   }
 
   // ---- rendering ----
-  function factRow(dt, dd) {
+  // opts.raw renders the raw field text as a code chip in the label;
+  // opts.wide spans the row across the whole facts grid.
+  function factRow(label, dd, opts) {
     var wrap = document.createElement("div");
-    wrap.className = "fact";
+    wrap.className = "fact" + (opts && opts.wide ? " fact-wide" : "");
     var t = document.createElement("dt");
-    t.textContent = dt;
+    t.appendChild(document.createTextNode(label));
+    if (opts && opts.raw) {
+      var c = document.createElement("code");
+      c.textContent = opts.raw;
+      t.appendChild(c);
+    }
     var d = document.createElement("dd");
     d.textContent = dd;
     wrap.appendChild(t);
@@ -381,11 +388,11 @@
     descEl.textContent = describe(res);
 
     if (res.expanded !== input.value.trim()) {
-      fieldsEl.appendChild(factRow("Expands to", res.expanded));
+      fieldsEl.appendChild(factRow("Expands to", res.expanded, { wide: true }));
     }
     for (var i = 0; i < 5; i++) {
       fieldsEl.appendChild(factRow(
-        FIELDS[i].label + " · " + res.fields[i].raw, meaning(i, res.fields[i])));
+        FIELDS[i].label, meaning(i, res.fields[i]), { raw: res.fields[i].raw }));
     }
     var domF = res.fields[2], dowF = res.fields[4];
     var domTrivial = kindOf(domF).kind === "every";
@@ -394,18 +401,27 @@
       fieldsEl.appendChild(factRow("Day rule",
         (domF.star || dowF.star)
           ? "both day fields must match (a field starting with * keeps AND matching)"
-          : "day of month OR day of week — either match runs the job"));
+          : "day of month OR day of week — either match runs the job",
+        { wide: true }));
     }
 
     var now = new Date();
     var runs = nextRuns(res, now, RUN_COUNT);
     for (var r = 0; r < runs.length; r++) {
       var li = document.createElement("li");
-      li.textContent = fmtRun(runs[r]) + " · " + DOW_NAMES[runs[r].getDay()];
+      if (r === 0) li.className = "run-next";
+      var when = document.createElement("span");
+      when.className = "run-when";
+      when.textContent = fmtRun(runs[r]);
+      li.appendChild(when);
+      var dowChip = document.createElement("span");
+      dowChip.className = "run-dow";
+      dowChip.textContent = DOW_NAMES[runs[r].getDay()];
+      li.appendChild(dowChip);
       if (r === 0) {
         var delta = document.createElement("span");
-        delta.className = "muted";
-        delta.textContent = " · " + humanDelta(runs[r].getTime() - now.getTime());
+        delta.className = "run-delta";
+        delta.textContent = humanDelta(runs[r].getTime() - now.getTime());
         li.appendChild(delta);
       }
       runsEl.appendChild(li);

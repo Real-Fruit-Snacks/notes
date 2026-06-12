@@ -811,9 +811,48 @@ pre.mermaid:not([data-processed]) {
 
 /* ---------- Cron parser ---------- */
 .cron-input { width: 100%; }
-.cron-desc { font-size: 1.1rem; font-weight: 600; margin: 1.1rem 0 .9rem; }
+.cron-desc {
+  font-size: 1.15rem; font-weight: 600; line-height: 1.5;
+  margin: 1.25rem 0 0; padding: .8rem 1rem;
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: var(--radius);
+}
 #cron-output.stale { opacity: .45; transition: opacity .15s ease; }
-#cron-fields { grid-template-columns: 1fr; }
-.cron-runs-title { margin-top: 1.4rem; }
-.cron-runs { font-family: var(--font-mono); font-size: .9rem; margin: .5rem 0 0; padding-left: 1.6rem; }
-.cron-runs li { margin: .2rem 0; }
+#cron-fields {
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: .6rem;
+}
+#cron-fields .fact { display: block; padding: .55rem .75rem; }
+#cron-fields dt {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .5rem; margin-bottom: .3rem;
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .05em;
+}
+#cron-fields dt code { text-transform: none; letter-spacing: normal; }
+#cron-fields dd { text-align: left; font-size: .92rem; }
+#cron-fields .fact-wide { grid-column: 1 / -1; }
+.cron-runs-title { margin-top: 1.6rem; }
+.cron-runs-title .muted { font-size: .85rem; font-weight: 400; }
+.cron-runs {
+  list-style: none; counter-reset: runs;
+  margin: .6rem 0 0; padding: 0;
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.cron-runs li {
+  display: flex; align-items: baseline; gap: .7rem;
+  padding: .45rem .85rem; border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: .9rem;
+}
+.cron-runs li:first-child { border-top: 0; }
+.cron-runs li:not(.muted)::before {
+  counter-increment: runs; content: counter(runs);
+  color: var(--muted); font-size: .76rem; min-width: 1.2rem; text-align: right;
+}
+.cron-runs li.muted { font-family: inherit; font-size: .85rem; }
+.cron-runs .run-next { background: var(--accent-soft); }
+.cron-runs .run-dow {
+  font-size: .72rem; padding: .05rem .5rem; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--muted);
+}
+.cron-runs .run-delta { margin-left: auto; color: var(--muted); font-size: .82rem; white-space: nowrap; }
