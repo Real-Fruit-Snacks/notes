@@ -828,7 +828,8 @@ pre.mermaid:not([data-processed]) {
 .cron-input { width: 100%; }
 .cron-desc,
 .chmod-desc,
-.cidr-desc {
+.cidr-desc,
+.ts-desc {
   font-size: 1.15rem; font-weight: 600; line-height: 1.5;
   margin: 1.25rem 0 0; padding: .8rem 1rem;
   background: var(--bg-alt); border: 1px solid var(--border);
@@ -932,3 +933,11 @@ pre.mermaid:not([data-processed]) {
 .cidr-split-title { margin-top: 1.8rem; }
 .split-net { width: 18ch; }
 .split-prefix { width: 7ch; }
+
+/* ---------- Timestamp converter ---------- */
+.ts-input-row { display: flex; align-items: center; gap: .75rem; }
+.ts-input-row .subnet-input { flex: 1 1 auto; }
+.ts-facts { grid-template-columns: 1fr; }
+.ts-facts dd { cursor: pointer; transition: background .25s ease; border-radius: 4px; }
+.ts-facts dd:hover { background: var(--accent-soft); }
+.ts-facts dd.ts-copied { background: var(--accent-soft); }
