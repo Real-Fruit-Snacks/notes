@@ -774,3 +774,23 @@ pre.mermaid:not([data-processed]) {
 .char-hashes { margin-top: 2rem; }
 #md5-grid { grid-template-columns: 1fr; }
 #md5-grid dd { overflow-wrap: anywhere; }
+
+/* ---------- Certificate checker ---------- */
+.cert-privacy { font-size: .85rem; }
+.cert-results { display: grid; gap: .75rem; margin-top: 1rem; }
+.cert-card {
+  background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: .75rem;
+}
+.cert-card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: .75rem; margin-bottom: .5rem; font-weight: 600;
+}
+.cert-badge {
+  font-family: var(--font-mono); font-size: .8rem;
+  padding: .15rem .55rem; border-radius: 999px; border: 1px solid;
+}
+.cert-valid { border-color: var(--ctp-green); color: var(--ctp-green); }
+.cert-warn { border-color: var(--ctp-yellow); color: var(--ctp-yellow); }
+.cert-expired { border-color: var(--ctp-red); color: var(--ctp-red); }
+.cert-card .subnet-facts { grid-template-columns: 1fr; margin: 0; }
