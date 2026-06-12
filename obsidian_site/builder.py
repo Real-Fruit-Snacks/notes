@@ -22,6 +22,7 @@ RESERVED_PAGES = {
     "chmod calculator": "tools/chmod",
     "cidr aggregator": "tools/cidr",
     "timestamp converter": "tools/timestamp",
+    "encoding playground": "tools/encoding",
 }
 
 

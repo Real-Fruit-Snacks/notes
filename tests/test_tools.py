@@ -78,6 +78,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/tools/chmod.html" in sitemap
     assert "https://example.com/myrepo/tools/cidr.html" in sitemap
     assert "https://example.com/myrepo/tools/timestamp.html" in sitemap
+    assert "https://example.com/myrepo/tools/encoding.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -126,8 +127,8 @@ def test_topbar_has_tools_dropdown(config):
     # Entries are alphabetical (case-insensitive) and each carries an icon.
     names = [
         "Certificate Checker", "Character Inspector", "chmod Calculator",
-        "CIDR Aggregator", "Cron Parser", "Subnet Calculator",
-        "Timestamp Converter",
+        "CIDR Aggregator", "Cron Parser", "Encoding Playground",
+        "Subnet Calculator", "Timestamp Converter",
     ]
     positions = [html.index(">" + n + "</a>") for n in names]
     assert positions == sorted(positions)
@@ -191,7 +192,7 @@ def test_certs_wikilink_resolves(tmp_path):
 
 def test_tool_example_buttons(config):
     build_site(config)
-    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr", "timestamp"):
+    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr", "timestamp", "encoding"):
         html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
         assert html.count('class="tool-examples"') == 1, page
         assert html.count('class="example-btn"') == 3, page
@@ -314,3 +315,32 @@ def test_timestamp_wikilink_resolves(tmp_path):
     assert 'href="/tools/timestamp.html"' in html
     assert '<span class="broken-link"' not in html
     assert not any("Timestamp" in w for w in warnings)
+
+
+def test_encoding_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "encoding.html").read_text(encoding="utf-8")
+    assert 'id="enc-input"' in html
+    assert 'id="enc-desc"' in html
+    assert 'id="enc-table"' in html
+    assert 'id="enc-wiki"' in html
+    assert html.count('class="mode-btn"') == 5
+    assert "/myrepo/assets/tools/encoding.js" in html
+    assert html.count('class="wiki-entry"') == 10
+
+
+def test_encoding_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Encoding Playground]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/encoding.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Encoding" in w for w in warnings)

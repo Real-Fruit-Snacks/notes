@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/encoding.html" %}
+{% block title %}Encoding Playground · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Encoding Playground</h1>
+  <p class="muted">Everything is bytes. Paste text — or Base64, percent-encoding,
+  hex, binary — pick what to treat it as, and read the same bytes back in every
+  representation at once, with SHA-256/512 fingerprints. Click any value to
+  copy it. (The <a href="{{ base_url }}tools/characters.html">Character
+  Inspector</a> is this page's per-character sibling.)</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <textarea id="enc-input" class="char-input" rows="5"
+    placeholder="Type or paste text, Base64, %75%72%6C, hex, or binary…"
+    autocomplete="off" autocapitalize="off" spellcheck="false"
+    aria-label="Data to encode or decode"></textarea>
+  <div class="enc-modes" role="group" aria-label="How to interpret the input">
+    <span class="examples-label muted">Treat input as:</span>
+    <button type="button" class="mode-btn" data-mode="text" aria-pressed="true">Plain text</button>
+    <button type="button" class="mode-btn" data-mode="base64" aria-pressed="false">Base64</button>
+    <button type="button" class="mode-btn" data-mode="url" aria-pressed="false">URL-encoded</button>
+    <button type="button" class="mode-btn" data-mode="hex" aria-pressed="false">Hex</button>
+    <button type="button" class="mode-btn" data-mode="binary" aria-pressed="false">Binary</button>
+  </div>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="hello">Hello, World!</button>
+    <button type="button" class="example-btn" data-example="b64">Base64 round-trip</button>
+    <button type="button" class="example-btn" data-example="jwt">JWT header (base64url)</button>
+  </div>
+  <p id="enc-error" class="subnet-error" hidden aria-live="polite"></p>
+  <div id="enc-output">
+    <p id="enc-desc" class="enc-desc" aria-live="polite" hidden></p>
+    <dl id="enc-table" class="subnet-facts enc-facts" aria-live="polite" aria-atomic="true"></dl>
+  </div>
+  <section class="tool-wiki" id="enc-wiki">
+    <h2>Understanding the representations</h2>
+    <details class="wiki-entry">
+      <summary>It's all bytes</summary>
+      <p>Every row on this page shows the <em>same bytes</em> through a
+      different lens. Text is just one of the lenses — your input is decoded
+      to bytes first (UTF-8 when you choose plain text), and Base64, hex,
+      binary, percent-encoding and the digests are all computed from that one
+      byte array. Change the mode, not the data.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Base64</summary>
+      <p>Base64 repacks every 3 bytes into 4 characters from a 64-symbol
+      alphabet (<code>A–Z a–z 0–9 + /</code>), padding the tail with
+      <code>=</code>. It exists so binary data can ride through channels that
+      only promise to preserve text — email bodies, JSON strings, data URIs —
+      at the cost of 33% growth. It is an <em>encoding</em>, not encryption:
+      anyone can reverse it.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Base64url &amp; the JWT trap</summary>
+      <p>URLs and filenames can't carry <code>+</code> or <code>/</code>, so
+      base64url swaps them for <code>-</code> and <code>_</code> and usually
+      drops the <code>=</code> padding. JWTs are the famous case — paste a
+      token segment into a strict decoder and it chokes. This page accepts
+      both alphabets and missing padding, and shows the base64url form on its
+      own row.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>URL percent-encoding</summary>
+      <p>Each byte outside the unreserved set (letters, digits,
+      <code>-&nbsp;_&nbsp;.&nbsp;~</code>) becomes <code>%</code> plus two hex
+      digits — one <code>%XX</code> per <em>byte</em>, so 💩 is four of them.
+      Beware the space: RFC&nbsp;3986 says <code>%20</code>, but HTML form
+      encoding says <code>+</code> — this page treats <code>+</code> as a
+      literal plus, so form-encoded data needs its pluses swapped first.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Hex</summary>
+      <p>One byte, two hex digits — the most literal view of binary data
+      short of bits. It's the lingua franca of digests, MAC addresses, and
+      memory dumps. The decoder here is forgiving: spaces, <code>0x</code>
+      prefixes, colons and case are all tolerated; only an odd digit count or
+      a non-hex character is an error.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Binary</summary>
+      <p>The bits themselves, padded to eight per byte. Nobody transmits data
+      this way — it's a teaching view, and the place to see why hex won: the
+      same byte is <code>01001000</code> in binary, <code>48</code> in hex.
+      The decoder accepts any spacing as long as the digit count is a
+      multiple of eight.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>SHA-256 &amp; SHA-512</summary>
+      <p>One-way fingerprints from the SHA-2 family, computed here with your
+      browser's built-in WebCrypto. Fixed sizes — 64 and 128 hex digits — no
+      matter the input, and changing a single bit scrambles the whole digest
+      (edit one character above and watch). Unlike the
+      <a href="{{ base_url }}tools/characters.html">Character Inspector</a>'s
+      MD5 panel, these are still considered collision-resistant; unlike
+      encryption, there is no way to "decode" a digest.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Encoding is not encryption</summary>
+      <p>Base64, hex and friends require no key and hide nothing — they're
+      <em>transport formats</em>. If a system "protects" data by Base64-ing
+      it, the protection is a polite fiction. Encryption needs a secret;
+      hashing destroys the data one-way; encoding just re-spells it.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>When decoding fails</summary>
+      <p>Each format fails its own way: Base64 with characters outside its
+      alphabet or an impossible length (4n+1); hex with an odd number of
+      digits; binary with a bit count that isn't a multiple of 8. And bytes
+      that aren't valid UTF-8 still decode — the text row shows
+      <code>�</code> replacement characters and says so, because the bytes
+      themselves are still perfectly good bytes.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Why UTF-8 is the baseline</summary>
+      <p>"Plain text" has to become bytes somehow, and this page — like
+      essentially the whole modern web — uses UTF-8: ASCII stays one
+      identical byte, everything else uses 2–4. The same text in UTF-16
+      would produce different bytes, different Base64, and different
+      digests, which is why "hash of a string" is meaningless until someone
+      names the encoding.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/encoding.js"></script>
+{% endblock %}
