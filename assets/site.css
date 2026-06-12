@@ -897,4 +897,5 @@ pre.mermaid:not([data-processed]) {
 .chmod-octal { width: 8ch; }
 .chmod-symbolic { width: 26ch; }
 .chmod-umask-title { margin-top: 1.8rem; }
+#umask-facts { grid-template-columns: 1fr; }
 #chmod-output.stale { opacity: .45; transition: opacity .15s ease; }
