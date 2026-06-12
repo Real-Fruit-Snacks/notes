@@ -9,6 +9,7 @@
   all three stay in sync, with the umask's effect alongside.</p>
   <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
 
+  <div class="chmod-controls">
   <table class="chmod-table" id="chmod-grid" aria-label="Permission bits">
     <thead>
       <tr>
@@ -62,6 +63,7 @@
         aria-label="Symbolic mode">
     </label>
   </div>
+  </div>
   <div class="tool-examples">
     <span class="examples-label muted">Try an example:</span>
     <button type="button" class="example-btn" data-example="classic">755</button>
@@ -72,6 +74,7 @@
 
   <div id="chmod-output">
     <p id="chmod-desc" class="chmod-desc" aria-live="polite"></p>
+    <div id="chmod-anatomy" class="cron-expr chmod-anatomy" aria-hidden="true"></div>
     <dl id="chmod-facts" class="subnet-facts" aria-live="polite" aria-atomic="true"></dl>
 
     <h2 class="chmod-umask-title">umask interaction</h2>

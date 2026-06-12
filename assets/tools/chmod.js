@@ -13,6 +13,7 @@
   var umaskInput = document.getElementById("chmod-umask");
   var errorEl = document.getElementById("chmod-error");
   var descEl = document.getElementById("chmod-desc");
+  var anatomyEl = document.getElementById("chmod-anatomy");
   var factsEl = document.getElementById("chmod-facts");
   var umaskFacts = document.getElementById("umask-facts");
   var outputEl = document.getElementById("chmod-output");
@@ -172,6 +173,40 @@
     return wrap;
   }
 
+  // ---- anatomy: octal digits and ls triads, color-keyed by class ----
+  function seg(text, label, cls) {
+    var wrap = document.createElement("span");
+    wrap.className = "seg";
+    var val = document.createElement("span");
+    val.className = "seg-val " + cls;
+    val.textContent = text;
+    var cap = document.createElement("span");
+    cap.className = "seg-label";
+    cap.textContent = label;
+    wrap.appendChild(val);
+    wrap.appendChild(cap);
+    return wrap;
+  }
+
+  function renderAnatomy() {
+    if (!anatomyEl) return;
+    anatomyEl.textContent = "";
+    var special = Math.floor(mode / 512) % 8;
+    if (special) anatomyEl.appendChild(seg(String(special), "special", "seg-sp"));
+    anatomyEl.appendChild(seg(String(triad(mode, 6)), "user", "seg-u"));
+    anatomyEl.appendChild(seg(String(triad(mode, 3)), "group", "seg-g"));
+    anatomyEl.appendChild(seg(String(triad(mode, 0)), "other", "seg-o"));
+    var divider = document.createElement("span");
+    divider.className = "seg-divider";
+    divider.textContent = "=";
+    anatomyEl.appendChild(divider);
+    var ls = lsString(mode);
+    anatomyEl.appendChild(seg("-", "type", "seg-type"));
+    anatomyEl.appendChild(seg(ls.slice(0, 3), "user", "seg-u"));
+    anatomyEl.appendChild(seg(ls.slice(3, 6), "group", "seg-g"));
+    anatomyEl.appendChild(seg(ls.slice(6, 9), "other", "seg-o"));
+  }
+
   function refresh(source) {
     for (var i = 0; i < boxes.length; i++) {
       boxes[i].checked = (mode & BITS[boxes[i].getAttribute("data-bit")]) !== 0;
@@ -188,6 +223,7 @@
       symbolicInput.value = symbolicCanonical(mode);
     }
     descEl.textContent = english(mode);
+    renderAnatomy();
     factsEl.textContent = "";
     factsEl.appendChild(factRow("Octal", octalStr(mode)));
     factsEl.appendChild(factRow("Symbolic", symbolicCanonical(mode)));

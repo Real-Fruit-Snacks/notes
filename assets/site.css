@@ -1096,3 +1096,23 @@ pre.mermaid:not([data-processed]) {
 .home-folder li { margin: .25rem 0; }
 .home-folder a { color: var(--muted); font-size: .9rem; }
 .home-folder a:hover { color: var(--accent); text-decoration: none; }
+
+/* ---------- chmod anatomy & class color keys ---------- */
+.chmod-controls { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; margin-top: 1rem; }
+.chmod-controls .chmod-table { margin: 0; }
+.chmod-controls .chmod-inputs { flex-direction: column; margin-top: 0; gap: .75rem; }
+.chmod-anatomy { gap: 1rem; }
+.seg-u { color: var(--ctp-blue); }
+.seg-g { color: var(--ctp-teal); }
+.seg-o { color: var(--ctp-green); }
+.seg-sp { color: var(--ctp-mauve); }
+.seg-type { color: var(--muted); }
+.seg-divider { align-self: center; color: var(--muted); font-family: var(--font-mono); font-size: 1.1rem; }
+.chmod-table tbody th { border-left: 3px solid transparent; }
+.chmod-table tbody tr:nth-child(1) th { border-left-color: var(--ctp-blue); }
+.chmod-table tbody tr:nth-child(2) th { border-left-color: var(--ctp-teal); }
+.chmod-table tbody tr:nth-child(3) th { border-left-color: var(--ctp-green); }
+.chmod-digit[data-digit="u"] { color: var(--ctp-blue); }
+.chmod-digit[data-digit="g"] { color: var(--ctp-teal); }
+.chmod-digit[data-digit="o"] { color: var(--ctp-green); }
+#chmod-facts { grid-template-columns: 1fr; }
