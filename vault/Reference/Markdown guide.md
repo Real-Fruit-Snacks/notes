@@ -13,7 +13,7 @@ A single note that exercises **every** kind of content the site renders. See als
 
 ## Headings
 
-The six heading levels each get their own Catppuccin colour:
+The six heading levels each get their own theme accent colour:
 
 ## Heading level 2
 ### Heading level 3

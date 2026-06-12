@@ -11,7 +11,7 @@
     .then(draw)
     .catch(function () { mount.textContent = "Could not load graph data."; });
 
-  // Catppuccin accents, read from CSS variables so they follow the theme.
+  // Palette accents, read from CSS variables so they follow the theme.
   var PALETTE_VARS = ["--ctp-blue", "--ctp-green", "--ctp-peach", "--ctp-red",
                       "--ctp-mauve", "--ctp-teal", "--ctp-yellow", "--ctp-pink",
                       "--ctp-sapphire", "--ctp-lavender"];

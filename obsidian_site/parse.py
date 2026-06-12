@@ -184,13 +184,14 @@ class Parser:
 def pygments_css() -> str:
     """Return the Pygments stylesheet for both themes.
 
-    Mocha rules are emitted unscoped (dark is the default theme); Latte rules
-    are scoped under ``[data-theme="light"]``. The container-background rule of
+    Mocha rules are emitted unscoped (it is the default theme); Tokyo Night
+    rules are scoped under ``[data-theme="light"]`` (the legacy slot name for
+    the alternate theme — both are dark). The container-background rule of
     each is dropped so our theme variable (``--code-bg``) controls the block
     background, and the unscoped pre/linenos boilerplate (which Pygments does
     not prefix with the scope) is kept only once, from the Mocha pass.
     """
-    from .pygments_catppuccin import CatppuccinLatte, CatppuccinMocha
+    from .pygments_styles import CatppuccinMocha, TokyoNight
 
     boilerplate = re.compile(
         r"^(?:pre|td\.linenos[^{]*|span\.linenos[^{]*)\s*\{[^}]*\}\n?", re.MULTILINE
@@ -205,5 +206,5 @@ def pygments_css() -> str:
         return css.strip()
 
     mocha = defs(CatppuccinMocha, ".highlight")
-    latte = defs(CatppuccinLatte, '[data-theme="light"] .highlight', strip_boilerplate=True)
-    return mocha + "\n\n/* Light theme (Catppuccin Latte) */\n" + latte
+    tokyo = defs(TokyoNight, '[data-theme="light"] .highlight', strip_boilerplate=True)
+    return mocha + "\n\n/* Alternate theme (Tokyo Night) */\n" + tokyo

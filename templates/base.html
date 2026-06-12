@@ -6,17 +6,16 @@
   <meta name="theme-color" content="#1e1e2e" id="meta-theme-color">
   <script>
     // Set the theme before first paint so there is no flash of wrong theme.
+    // Both themes are dark: "dark" = Catppuccin Mocha (default), "light" is
+    // the legacy storage key for Tokyo Night — no OS-preference mapping.
     (function () {
       var t = null;
       try { t = localStorage.getItem("theme"); } catch (e) {}
-      if (t !== "light" && t !== "dark") {
-        t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches
-          ? "light" : "dark";
-      }
+      if (t !== "light" && t !== "dark") t = "dark";
       document.documentElement.setAttribute("data-theme", t);
       if (t === "light") {
         var m = document.querySelector('meta[name="theme-color"]');
-        if (m) m.setAttribute("content", "#eff1f5");
+        if (m) m.setAttribute("content", "#1a1b26");
       }
       try {
         if (localStorage.getItem("sidebar") === "collapsed") {
@@ -57,7 +56,7 @@
           {% endfor %}
         </ul>
       </details>
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to Tokyo Night theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>

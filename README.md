@@ -10,7 +10,7 @@ Only notes carrying the **`publish` tag** (in frontmatter `tags:` or as an inlin
 
 - **Docs-style layout** — top bar with search, left folder-nav tree (with a mobile
   hamburger drawer), centered reading column, a per-note **table of contents**, and
-  inline "linked mentions" (backlinks). **Light/dark theme toggle** (Catppuccin Mocha/Latte), following the visitor's OS preference.
+  inline "linked mentions" (backlinks). **Two dark themes** with a toggle: Catppuccin Mocha (default) and Tokyo Night.
 - **Obsidian syntax:** wikilinks `[[note]]` / `[[note|alias]]` / `[[note#heading]]`
   (heading links jump to real anchors), image embeds `![[img.png]]`, note transclusions
   `![[note]]`, inline `#tags` + frontmatter tags, callouts (`> [!note]`, `> [!warning]`, …),

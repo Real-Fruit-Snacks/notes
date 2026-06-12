@@ -19,11 +19,13 @@ def test_theme_inline_script_and_toggle(config):
     assert 'name="theme-color"' in html                     # theme-color meta
 
 
-def test_css_has_light_theme_block(config):
+def test_css_has_alternate_theme_block(config):
     build_site(config)
     css = (config.out / "assets" / "site.css").read_text()
-    assert 'html[data-theme="light"]' in css
-    assert "#eff1f5" in css        # Latte base
+    assert 'html[data-theme="light"]' in css   # legacy slot name for the alternate theme
+    assert "#1a1b26" in css        # Tokyo Night base
+    # Both screen themes are dark; only the print block flips to light.
+    assert css.count("color-scheme: dark") == 2
     assert "color-scheme: light" in css
 
 
@@ -31,7 +33,7 @@ def test_pygments_css_covers_both_themes(config):
     build_site(config)
     css = (config.out / "assets" / "pygments.css").read_text()
     assert '[data-theme="light"] .highlight' in css
-    assert "#8839ef" in css.lower()   # Latte mauve (keywords)
+    assert "#bb9af7" in css.lower()   # Tokyo Night magenta (keywords)
     assert "#cba6f7" in css.lower()   # Mocha mauve still present
     # The container background rules must be stripped (theme var controls it).
     assert ".highlight { background" not in css

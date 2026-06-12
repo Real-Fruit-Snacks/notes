@@ -1,8 +1,14 @@
-"""Pygments styles implementing the Catppuccin Mocha and Latte palettes.
+"""Pygments styles for the site's two (both dark) themes.
 
-Pygments ships no Catppuccin style, so we define them here rather than pulling
-in an extra dependency. Token -> colour choices follow Catppuccin's
-syntax-highlight style guide (https://github.com/catppuccin/catppuccin).
+Catppuccin Mocha is the default theme; Tokyo Night (the classic dark "night"
+variant) is the alternate, served under the legacy ``data-theme="light"``
+scope. Pygments ships neither style, so we define them here rather than
+pulling in an extra dependency. Token -> colour-role choices follow
+Catppuccin's syntax-highlight style guide
+(https://github.com/catppuccin/catppuccin); the Tokyo Night palette is
+slot-translated onto the same roles, which lands close to Tokyo Night's own
+conventions (keywords magenta, functions blue, strings green, numbers orange,
+comments grey-blue italic, operators sky blue).
 """
 from __future__ import annotations
 
@@ -22,19 +28,23 @@ MOCHA = {
     "surface2": "#585b70", "base": "#1e1e2e",
 }
 
-LATTE = {
-    "pink": "#ea76cb", "mauve": "#8839ef", "red": "#d20f39", "maroon": "#e64553",
-    "peach": "#fe640b", "yellow": "#df8e1d", "green": "#40a02b", "teal": "#179299",
-    "sky": "#04a5e5", "sapphire": "#209fb5", "blue": "#1e66f5", "lavender": "#7287fd",
-    "text": "#4c4f69", "overlay2": "#7c7f93", "overlay0": "#9ca0b0",
-    "surface2": "#acb0be", "base": "#eff1f5",
+# Tokyo Night "night" palette in Catppuccin slot names. Slot picks:
+# maroon->red1, peach->orange, sky->blue5 (operators), sapphire->cyan,
+# lavender->blue6, pink->magenta2, overlay2->comment, overlay0->fg_gutter,
+# surface2->bg_highlight.
+TOKYONIGHT = {
+    "pink": "#ff007c", "mauve": "#bb9af7", "red": "#f7768e", "maroon": "#db4b4b",
+    "peach": "#ff9e64", "yellow": "#e0af68", "green": "#9ece6a", "teal": "#73daca",
+    "sky": "#89ddff", "sapphire": "#7dcfff", "blue": "#7aa2f7", "lavender": "#b4f9f8",
+    "text": "#c0caf5", "overlay2": "#565f89", "overlay0": "#3b4261",
+    "surface2": "#292e42", "base": "#1a1b26",
 }
 
 
 def _styles(c: dict[str, str]) -> dict:
-    """Build the Pygments token-style dict from a Catppuccin palette mapping.
+    """Build the Pygments token-style dict from a slot-named palette mapping.
 
-    *c* must provide the keys present in :data:`MOCHA` / :data:`LATTE`.
+    *c* must provide the keys present in :data:`MOCHA` / :data:`TOKYONIGHT`.
     """
     return {
         Text: c["text"],
@@ -103,9 +113,9 @@ class CatppuccinMocha(Style):
     styles = _styles(MOCHA)
 
 
-class CatppuccinLatte(Style):
-    name = "catppuccin-latte"
-    background_color = LATTE["base"]
-    highlight_color = LATTE["surface2"]
-    line_number_color = LATTE["overlay0"]
-    styles = _styles(LATTE)
+class TokyoNight(Style):
+    name = "tokyo-night"
+    background_color = TOKYONIGHT["base"]
+    highlight_color = TOKYONIGHT["surface2"]
+    line_number_color = TOKYONIGHT["overlay0"]
+    styles = _styles(TOKYONIGHT)
