@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/chmod.html" %}
+{% block title %}chmod Calculator · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">chmod Calculator</h1>
+  <p class="muted">Tick permission bits, type an octal mode like
+  <code>755</code>, or apply symbolic notation like <code>u=rwx,go=rx</code> —
+  all three stay in sync, with the umask's effect alongside.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+
+  <table class="chmod-table" id="chmod-grid" aria-label="Permission bits">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Read</th>
+        <th scope="col">Write</th>
+        <th scope="col">Execute</th>
+        <th scope="col" class="chmod-special-col">Special</th>
+        <th scope="col">Digit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">User</th>
+        <td><input type="checkbox" class="chmod-bit" data-bit="ur" aria-label="User read" checked></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="uw" aria-label="User write" checked></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="ux" aria-label="User execute" checked></td>
+        <td class="chmod-special-col"><label class="chmod-special-label"><input type="checkbox" class="chmod-bit" data-bit="su" aria-label="setuid"> setuid</label></td>
+        <td class="chmod-digit" data-digit="u">7</td>
+      </tr>
+      <tr>
+        <th scope="row">Group</th>
+        <td><input type="checkbox" class="chmod-bit" data-bit="gr" aria-label="Group read" checked></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="gw" aria-label="Group write"></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="gx" aria-label="Group execute" checked></td>
+        <td class="chmod-special-col"><label class="chmod-special-label"><input type="checkbox" class="chmod-bit" data-bit="sg" aria-label="setgid"> setgid</label></td>
+        <td class="chmod-digit" data-digit="g">5</td>
+      </tr>
+      <tr>
+        <th scope="row">Other</th>
+        <td><input type="checkbox" class="chmod-bit" data-bit="or" aria-label="Other read" checked></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="ow" aria-label="Other write"></td>
+        <td><input type="checkbox" class="chmod-bit" data-bit="ox" aria-label="Other execute" checked></td>
+        <td class="chmod-special-col"><label class="chmod-special-label"><input type="checkbox" class="chmod-bit" data-bit="st" aria-label="sticky bit"> sticky</label></td>
+        <td class="chmod-digit" data-digit="o">5</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="chmod-inputs">
+    <label class="chmod-field">
+      <span class="muted">Octal</span>
+      <input type="text" id="chmod-octal" class="subnet-input chmod-octal" value="755"
+        autocomplete="off" autocapitalize="off" spellcheck="false"
+        aria-label="Octal mode">
+    </label>
+    <label class="chmod-field">
+      <span class="muted">Symbolic (absolute or +/− relative)</span>
+      <input type="text" id="chmod-symbolic" class="subnet-input chmod-symbolic" value="u=rwx,g=rx,o=rx"
+        autocomplete="off" autocapitalize="off" spellcheck="false"
+        aria-label="Symbolic mode">
+    </label>
+  </div>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="classic">755</button>
+    <button type="button" class="example-btn" data-example="setuid">4755 setuid</button>
+    <button type="button" class="example-btn" data-example="private">u=rw,go=</button>
+  </div>
+  <p id="chmod-error" class="subnet-error" hidden aria-live="polite"></p>
+
+  <div id="chmod-output">
+    <p id="chmod-desc" class="chmod-desc" aria-live="polite"></p>
+    <dl id="chmod-facts" class="subnet-facts" aria-live="polite" aria-atomic="true"></dl>
+
+    <h2 class="chmod-umask-title">umask interaction</h2>
+    <p class="muted">A process's umask <em>removes</em> bits at creation time:
+    files start from <code>666</code>, directories from <code>777</code>.</p>
+    <label class="chmod-field">
+      <span class="muted">umask</span>
+      <input type="text" id="chmod-umask" class="subnet-input chmod-octal" value="022"
+        autocomplete="off" autocapitalize="off" spellcheck="false"
+        aria-label="umask value">
+    </label>
+    <dl id="umask-facts" class="subnet-facts" aria-live="polite" aria-atomic="true"></dl>
+  </div>
+
+  <section class="tool-wiki" id="chmod-wiki">
+    <h2>Understanding the bits</h2>
+    <details class="wiki-entry">
+      <summary>The three triads</summary>
+      <p>A mode is three groups of three bits — <strong>user</strong> (the
+      owner), <strong>group</strong>, and <strong>other</strong> (everyone
+      else) — each holding read, write and execute. <code>ls -l</code> prints
+      them in exactly that order: <code>-rwxr-xr-x</code> is
+      <code>rwx</code> for the owner, <code>r-x</code> for the group,
+      <code>r-x</code> for the world, and the leading character is the file
+      type (<code>-</code> file, <code>d</code> directory).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Octal: why 755 means rwxr-xr-x</summary>
+      <p>Each triad is one octal digit: read is 4, write is 2, execute is 1,
+      added together. <code>rwx</code> = 4+2+1 = <code>7</code>;
+      <code>r-x</code> = 4+1 = <code>5</code>. Three triads, three digits:
+      <code>755</code>. A fourth, leading digit carries the special bits —
+      setuid 4, setgid 2, sticky 1 — so <code>4755</code> is
+      <code>755</code> plus setuid.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Symbolic notation</summary>
+      <p>Letters instead of arithmetic: <code>u</code>, <code>g</code>,
+      <code>o</code> pick a class (<code>a</code> or nothing = all),
+      then <code>=</code> sets exactly, <code>+</code> adds, <code>-</code>
+      removes. Clauses chain with commas: <code>u=rwx,go=rx</code> ≡
+      <code>755</code>; <code>go-w</code> revokes group/other write and
+      leaves the rest alone — handy when you don't know (or care about) the
+      current mode. A capital <code>X</code> adds execute only where
+      something is already executable.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Directories: x means enter, w means delete</summary>
+      <p>On a directory the bits shift meaning: <code>r</code> lists names,
+      <code>x</code> lets you <em>enter</em> it (and reach anything inside),
+      <code>w</code> creates, renames and <strong>deletes</strong> entries —
+      which is why deleting a file needs write on the <em>directory</em>, not
+      on the file itself. A directory with <code>r</code> but no
+      <code>x</code> is a list of names you can't touch; <code>755</code> on
+      directories is the everyday default.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>setuid (4xxx)</summary>
+      <p>An executable with setuid runs <em>as its owner</em>, not as the user
+      who launched it — <code>passwd</code> is root-owned and setuid so
+      ordinary users can update <code>/etc/shadow</code>. In
+      <code>ls -l</code> it replaces the owner's <code>x</code> slot:
+      <code>s</code> if execute is also set (<code>rws</code>), capital
+      <code>S</code> if not — a capital S is almost always a mistake. Most
+      kernels ignore setuid on scripts, and on directories it does nothing on
+      Linux.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>setgid (2xxx)</summary>
+      <p>On an executable, setgid runs it with the file's <em>group</em>. The
+      everyday use is on <strong>directories</strong>: new files created
+      inside inherit the directory's group instead of the creator's primary
+      group — the standard trick for shared project folders
+      (<code>chmod 2775 shared/</code>). Shown in the group's execute slot as
+      <code>s</code> (or <code>S</code> without execute).</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Sticky bit (1xxx)</summary>
+      <p>On a world-writable directory, the sticky bit restricts deletion:
+      only a file's owner (or the directory's owner, or root) may remove or
+      rename it. That's what keeps users from deleting each other's files in
+      <code>/tmp</code>, which is mode <code>1777</code> —
+      <code>rwxrwxrwt</code>. It sits in the last execute slot as
+      <code>t</code> (or <code>T</code> without execute); its old meaning on
+      executables is long obsolete.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>umask: the permission filter</summary>
+      <p>No file is born <code>777</code>. Programs request a mode —
+      conventionally <code>666</code> for files, <code>777</code> for
+      directories — and the process's umask <em>clears</em> its bits from the
+      request: with the common <code>022</code>, files appear as
+      <code>644</code> and directories as <code>755</code>. That subtraction
+      is also why fresh files never have execute. <code>077</code> keeps
+      everything private to you; <code>002</code> leaves group write for
+      shared work.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Modes you'll meet everywhere</summary>
+      <p><code>644</code> ordinary file · <code>600</code> private file (SSH
+      keys insist on it) · <code>755</code> executable or directory ·
+      <code>700</code> private directory · <code>2775</code> shared group
+      directory · <code>1777</code> world-writable with sticky
+      (<code>/tmp</code>) · <code>400</code> read-only secret · and
+      <code>777</code>, which is almost always the wrong answer.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>What this calculator assumes</summary>
+      <p>Symbolic <code>=</code> replaces a class's triad and clears that
+      class's special bit unless you list it (<code>u=rwxs</code> keeps
+      setuid) — GNU chmod behaves this way on files, though some systems
+      preserve setuid/setgid on directories unless told explicitly. One
+      operator per comma-clause is supported here; real chmod also allows
+      chains like <code>u+r-w</code>. The umask panel masks the classic
+      <code>666</code>/<code>777</code> creation requests.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/chmod.js"></script>
+{% endblock %}

@@ -75,6 +75,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/tools/subnet.html" in sitemap
     assert "https://example.com/myrepo/tools/certs.html" in sitemap
     assert "https://example.com/myrepo/tools/cron.html" in sitemap
+    assert "https://example.com/myrepo/tools/chmod.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -114,6 +115,8 @@ def test_topbar_has_tools_dropdown(config):
     assert ">Certificate Checker</a>" in html
     assert 'href="/myrepo/tools/cron.html"' in html
     assert ">Cron Parser</a>" in html
+    assert 'href="/myrepo/tools/chmod.html"' in html
+    assert ">chmod Calculator</a>" in html
 
 
 def test_subnet_wiki_present(config):
@@ -173,7 +176,7 @@ def test_certs_wikilink_resolves(tmp_path):
 
 def test_tool_example_buttons(config):
     build_site(config)
-    for page in ("characters", "subnet", "certs", "cron"):
+    for page in ("characters", "subnet", "certs", "cron", "chmod"):
         html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
         assert html.count('class="tool-examples"') == 1, page
         assert html.count('class="example-btn"') == 3, page
@@ -207,3 +210,33 @@ def test_cron_wikilink_resolves(tmp_path):
     assert 'href="/tools/cron.html"' in html
     assert '<span class="broken-link"' not in html
     assert not any("Cron" in w for w in warnings)
+
+
+def test_chmod_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "chmod.html").read_text(encoding="utf-8")
+    assert 'id="chmod-grid"' in html
+    assert 'id="chmod-octal"' in html
+    assert 'id="chmod-symbolic"' in html
+    assert 'id="chmod-desc"' in html
+    assert 'id="chmod-umask"' in html
+    assert 'id="chmod-wiki"' in html
+    assert "/myrepo/assets/tools/chmod.js" in html
+    assert html.count('class="wiki-entry"') == 10
+
+
+def test_chmod_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Chmod Calculator]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/chmod.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("hmod" in w for w in warnings)

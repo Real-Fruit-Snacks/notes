@@ -19,6 +19,7 @@ RESERVED_PAGES = {
     "subnet calculator": "tools/subnet",
     "certificate checker": "tools/certs",
     "cron parser": "tools/cron",
+    "chmod calculator": "tools/chmod",
 }
 
 
