@@ -12,6 +12,8 @@
   var errorEl = document.getElementById("cidr-error");
   var noticeEl = document.getElementById("cidr-notice");
   var descEl = document.getElementById("cidr-desc");
+  var statsEl = document.getElementById("cidr-stats");
+  var splitCount = document.getElementById("split-count");
   var placeholderEl = document.getElementById("cidr-placeholder");
   var resultsHead = document.querySelector(".cidr-results-head");
   var copyBtn = document.getElementById("cidr-copy");
@@ -110,7 +112,8 @@
         if (p.error) skipped.push({ lineNo: ln + 1, text: entry, error: p.error });
         else {
           if (p.normalized) normalized++;
-          nets.push({ base: p.base, prefix: p.prefix, inputs: 1 });
+          nets.push({ base: p.base, prefix: p.prefix, inputs: 1,
+            sources: [intToIp(p.base) + "/" + p.prefix] });
         }
       }
     }
@@ -120,8 +123,12 @@
   // ---- minimal exact covering set ----
   // After host-bit normalization every block is aligned, so two blocks
   // either nest or are disjoint - a single sorted containment sweep plus
-  // sibling merges to a fixed point yields the minimal set.
+  // sibling merges to a fixed point yields the minimal set. Side stats land
+  // in lastAggStats; per-block source lists ride along when provided.
+  var lastAggStats = { dups: 0, contained: 0, merges: 0 };
+
   function aggregate(nets) {
+    lastAggStats = { dups: 0, contained: 0, merges: 0 };
     var sorted = nets.slice().sort(function (a, b) {
       return a.base - b.base || a.prefix - b.prefix;
     });
@@ -131,8 +138,12 @@
       var last = kept[kept.length - 1];
       if (last && n.base + sizeOf(n.prefix) <= last.base + sizeOf(last.prefix)) {
         last.inputs += n.inputs; // duplicate or contained: absorb
+        if (n.base === last.base && n.prefix === last.prefix) lastAggStats.dups++;
+        else lastAggStats.contained++;
+        if (n.sources) last.sources = (last.sources || []).concat(n.sources);
       } else {
-        kept.push({ base: n.base, prefix: n.prefix, inputs: n.inputs });
+        kept.push({ base: n.base, prefix: n.prefix, inputs: n.inputs,
+          sources: n.sources ? n.sources.slice() : [] });
       }
     }
     var changed = true;
@@ -143,7 +154,9 @@
         var size = sizeOf(a.prefix);
         if (a.prefix === b.prefix && a.prefix > 0 &&
             a.base % (size * 2) === 0 && b.base === a.base + size) {
-          kept.splice(k, 2, { base: a.base, prefix: a.prefix - 1, inputs: a.inputs + b.inputs });
+          kept.splice(k, 2, { base: a.base, prefix: a.prefix - 1, inputs: a.inputs + b.inputs,
+            sources: (a.sources || []).concat(b.sources || []) });
+          lastAggStats.merges++;
           changed = true;
           k--; // the new supernet may merge again immediately
         }
@@ -193,6 +206,7 @@
     errorEl.hidden = true;
     noticeEl.hidden = true;
     descEl.hidden = true;
+    statsEl.hidden = true;
     resultsHead.hidden = true;
     lastList = "";
     if (!input.value.replace(/\s/g, "")) {
@@ -232,6 +246,21 @@
       ", exactly covered" +
       (out.length === parsed.nets.length ? " — already minimal, nothing merged." : ".");
     descEl.hidden = false;
+    var stats = [];
+    if (lastAggStats.dups) {
+      stats.push(lastAggStats.dups + " duplicate" + (lastAggStats.dups > 1 ? "s" : "") + " dropped");
+    }
+    if (lastAggStats.contained) {
+      stats.push(lastAggStats.contained + " contained block" +
+        (lastAggStats.contained > 1 ? "s" : "") + " absorbed");
+    }
+    if (lastAggStats.merges) {
+      stats.push(lastAggStats.merges + " sibling merge" + (lastAggStats.merges > 1 ? "s" : ""));
+    }
+    if (stats.length) {
+      statsEl.textContent = stats.join(" · ");
+      statsEl.hidden = false;
+    }
     resultsHead.hidden = false;
 
     var list = [];
@@ -244,7 +273,32 @@
           (sizeOf(n.prefix) > 1 ? " addresses" : " address") },
       ];
       if (n.inputs > 1) extra.push({ text: "← " + n.inputs + " inputs", fill: true });
-      resultsEl.appendChild(row(n, extra));
+      var li = row(n, extra);
+      // Show the work: which input networks this aggregate swallowed.
+      var uniq = [];
+      var sources = n.sources || [];
+      for (var s = 0; s < sources.length; s++) {
+        if (uniq.indexOf(sources[s]) === -1) uniq.push(sources[s]);
+      }
+      if (uniq.length > 1) {
+        var srcs = document.createElement("div");
+        srcs.className = "cidr-srcs";
+        var shown = Math.min(uniq.length, 8);
+        for (var c = 0; c < shown; c++) {
+          var chip = document.createElement("span");
+          chip.className = "cidr-src";
+          chip.textContent = uniq[c];
+          srcs.appendChild(chip);
+        }
+        if (uniq.length > shown) {
+          var more = document.createElement("span");
+          more.className = "cidr-src";
+          more.textContent = "+" + (uniq.length - shown) + " more";
+          srcs.appendChild(more);
+        }
+        li.appendChild(srcs);
+      }
+      resultsEl.appendChild(li);
     }
     lastList = list.join("\n");
   }
@@ -253,6 +307,7 @@
     splitResults.textContent = "";
     splitError.hidden = true;
     splitNotice.hidden = true;
+    splitCount.hidden = true;
     var parent = parseEntry(splitNet.value.trim());
     if (parent.error) {
       splitError.textContent = "Can't parse: " + parent.error + ".";
@@ -280,19 +335,16 @@
         { text: usableHosts(c.prefix).toLocaleString() + " usable", fill: true },
       ]));
     }
-    var notes = [];
     if (parent.normalized) {
-      notes.push("host bits rounded down: splitting " + cidrOf(parent));
+      splitNotice.textContent = "host bits rounded down: splitting " + cidrOf(parent);
+      splitNotice.hidden = false;
     }
-    if (res.count > SPLIT_MAX) {
-      notes.push("showing the first " + SPLIT_MAX + " of " +
-        res.count.toLocaleString() + " children");
-    } else {
-      notes.push(res.count.toLocaleString() + " child" + (res.count > 1 ? "ren" : "") +
-        " of " + sizeOf(child).toLocaleString() + " address" + (sizeOf(child) > 1 ? "es" : "") + " each");
-    }
-    splitNotice.textContent = notes.join(" · ");
-    splitNotice.hidden = false;
+    splitCount.textContent = res.count > SPLIT_MAX
+      ? "Showing the first " + SPLIT_MAX + " of " + res.count.toLocaleString() + " children."
+      : res.count.toLocaleString() + " child" + (res.count > 1 ? "ren" : "") +
+        " of " + sizeOf(child).toLocaleString() + " address" +
+        (sizeOf(child) > 1 ? "es" : "") + " each.";
+    splitCount.hidden = false;
   }
 
   // ---- events ----

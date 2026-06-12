@@ -1116,3 +1116,11 @@ pre.mermaid:not([data-processed]) {
 .chmod-digit[data-digit="g"] { color: var(--ctp-teal); }
 .chmod-digit[data-digit="o"] { color: var(--ctp-green); }
 #chmod-facts { grid-template-columns: 1fr; }
+
+/* ---------- CIDR aggregation provenance ---------- */
+.cidr-stats { font-size: .85rem; margin: .5rem 0 0; }
+.cidr-srcs { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: .3rem; padding-left: 1.9rem; }
+.cidr-src {
+  font-size: .72rem; font-family: var(--font-mono); color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 0 .45rem;
+}
