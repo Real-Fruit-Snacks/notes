@@ -821,7 +821,8 @@ pre.mermaid:not([data-processed]) {
 
 /* ---------- Cron parser ---------- */
 .cron-input { width: 100%; }
-.cron-desc {
+.cron-desc,
+.chmod-desc {
   font-size: 1.15rem; font-weight: 600; line-height: 1.5;
   margin: 1.25rem 0 0; padding: .8rem 1rem;
   background: var(--bg-alt); border: 1px solid var(--border);
@@ -866,3 +867,34 @@ pre.mermaid:not([data-processed]) {
   border: 1px solid var(--border); color: var(--muted);
 }
 .cron-runs .run-delta { margin-left: auto; color: var(--muted); font-size: .82rem; white-space: nowrap; }
+
+/* ---------- chmod calculator ---------- */
+.chmod-table {
+  border-collapse: separate; border-spacing: 0;
+  margin: 1rem 0 0; background: var(--bg-alt);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.chmod-table th, .chmod-table td { padding: .5rem .9rem; text-align: center; }
+.chmod-table thead th {
+  font-size: .74rem; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600;
+}
+.chmod-table tbody th { text-align: left; font-weight: 600; }
+.chmod-table tbody tr + tr th, .chmod-table tbody tr + tr td { border-top: 1px solid var(--border); }
+.chmod-table input[type="checkbox"] {
+  width: 1.05rem; height: 1.05rem; accent-color: var(--accent); cursor: pointer;
+}
+.chmod-special-col { border-left: 1px solid var(--border); }
+.chmod-special-label {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .85rem; color: var(--muted); cursor: pointer;
+}
+.chmod-digit { font-family: var(--font-mono); font-weight: 600; color: var(--accent); border-left: 1px solid var(--border); }
+.chmod-inputs { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .9rem; }
+.chmod-field { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; }
+.chmod-field .subnet-input { flex: none; }
+.chmod-octal { width: 8ch; }
+.chmod-symbolic { width: 26ch; }
+.chmod-umask-title { margin-top: 1.8rem; }
+#chmod-output.stale { opacity: .45; transition: opacity .15s ease; }
