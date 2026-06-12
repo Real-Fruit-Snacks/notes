@@ -808,3 +808,11 @@ pre.mermaid:not([data-processed]) {
   transition: color .15s ease, border-color .15s ease;
 }
 .example-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- Cron parser ---------- */
+.cron-input { width: 100%; }
+.cron-desc { font-size: 1.1rem; font-weight: 600; margin: 1.1rem 0 .9rem; }
+#cron-output.stale { opacity: .45; transition: opacity .15s ease; }
+.cron-runs-title { margin-top: 1.4rem; }
+.cron-runs { font-family: var(--font-mono); font-size: .9rem; margin: .5rem 0 0; padding-left: 1.6rem; }
+.cron-runs li { margin: .2rem 0; }
