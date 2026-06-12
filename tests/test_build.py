@@ -33,6 +33,21 @@ def test_assets_copied(config):
     assert (out / "assets" / "diagram.png").exists()
 
 
+def test_pocket_bird_vendored(config):
+    build_site(config)
+    out = config.out
+    birb = out / "assets" / "vendor" / "pocket-bird" / "birb.embed.js"
+    assert birb.exists()
+    assert (out / "assets" / "vendor" / "pocket-bird" / "Monocraft.otf").exists()
+    # The upstream font fetch must stay patched to the local vendored copy.
+    src = birb.read_text(encoding="utf-8")
+    assert "cdn.jsdelivr.net" not in src
+    assert "assets/vendor/pocket-bird/Monocraft.otf" in src
+    html = (out / "index.html").read_text(encoding="utf-8")
+    assert "assets/vendor/pocket-bird/birb.embed.js" in html
+    assert "prefers-reduced-motion" in html
+
+
 def test_search_and_graph_json(config):
     build_site(config)
     out = config.out

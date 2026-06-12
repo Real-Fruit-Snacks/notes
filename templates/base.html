@@ -90,6 +90,15 @@
   <script src="{{ base_url }}assets/previews.js"></script>
   <script src="{{ base_url }}assets/localgraph.js"></script>
   <script src="{{ base_url }}assets/chrome.js"></script>
+  <script>
+    // Pocket-Bird page pet (vendored; see assets/vendor/pocket-bird/README.md).
+    // A constantly-animating companion is skipped for reduced-motion users.
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      var birb = document.createElement("script");
+      birb.src = "{{ base_url }}assets/vendor/pocket-bird/birb.embed.js";
+      document.body.appendChild(birb);
+    }
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
