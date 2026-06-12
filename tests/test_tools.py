@@ -120,6 +120,14 @@ def test_topbar_has_tools_dropdown(config):
     assert ">chmod Calculator</a>" in html
     assert 'href="/myrepo/tools/cidr.html"' in html
     assert ">CIDR Aggregator</a>" in html
+    # Entries are alphabetical (case-insensitive) and each carries an icon.
+    names = [
+        "Certificate Checker", "Character Inspector", "chmod Calculator",
+        "CIDR Aggregator", "Cron Parser", "Subnet Calculator",
+    ]
+    positions = [html.index(">" + n + "</a>") for n in names]
+    assert positions == sorted(positions)
+    assert html.count('class="tools-menu-icon"') == len(names)
 
 
 def test_subnet_wiki_present(config):

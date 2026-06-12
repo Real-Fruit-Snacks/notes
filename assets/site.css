@@ -626,9 +626,12 @@ pre.mermaid:not([data-processed]) {
   min-width: 12rem; z-index: 50;
 }
 .tools-menu-list a {
-  display: block; padding: .4rem .65rem; border-radius: 6px; color: var(--text);
+  display: flex; align-items: center; gap: .55rem;
+  padding: .4rem .65rem; border-radius: 6px; color: var(--text);
 }
 .tools-menu-list a:hover { background: var(--accent-soft); text-decoration: none; }
+.tools-menu-icon { width: 15px; height: 15px; flex: none; color: var(--muted); }
+.tools-menu-list a:hover .tools-menu-icon { color: inherit; }
 
 /* ---------- Character inspector ---------- */
 .char-input {
