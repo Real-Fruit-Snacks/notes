@@ -31,14 +31,14 @@
   });
 
   // Theme toggle: persists to localStorage; the head boot script applied the
-  // initial value. Dispatches "themechange" so canvases (graph) can recolour.
+  // initial value and CSS swaps the sun/moon icon off data-theme. Dispatches
+  // "themechange" so canvases (graph) can recolour.
   var themeBtn = document.getElementById("theme-toggle");
   var themeMeta = document.querySelector('meta[name="theme-color"]');
   function applyTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
     if (themeMeta) themeMeta.setAttribute("content", t === "light" ? "#eff1f5" : "#1e1e2e");
     if (themeBtn) {
-      themeBtn.textContent = t === "light" ? "☾" : "☀";
       themeBtn.setAttribute(
         "aria-label", t === "light" ? "Switch to dark theme" : "Switch to light theme"
       );

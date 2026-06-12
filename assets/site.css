@@ -398,10 +398,20 @@ pre.highlight[data-lang]:not([data-lang=""])::before {
 }
 .nav-toggle:hover { background: var(--accent-soft); }
 .theme-toggle {
+  display: inline-grid; place-items: center;
   background: none; border: 1px solid var(--border); border-radius: var(--radius);
-  color: var(--text); cursor: pointer; font-size: 1rem; line-height: 1; padding: .3rem .55rem;
+  color: var(--text); cursor: pointer; padding: .3rem;
 }
 .theme-toggle:hover { background: var(--accent-soft); }
+/* Both icons share the grid cell; data-theme picks which one shows.
+   Dark shows the sun (click for light), light shows the moon. */
+.theme-toggle svg {
+  grid-area: 1 / 1; width: 1.05rem; height: 1.05rem;
+  transition: opacity .2s ease, transform .3s ease;
+}
+.theme-toggle .icon-moon { opacity: 0; transform: rotate(90deg) scale(.5); }
+[data-theme="light"] .theme-toggle .icon-moon { opacity: 1; transform: none; }
+[data-theme="light"] .theme-toggle .icon-sun { opacity: 0; transform: rotate(-90deg) scale(.5); }
 .scrim {
   position: fixed; inset: 0; z-index: 15;
   background: var(--scrim-bg);
