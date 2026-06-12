@@ -77,6 +77,7 @@ def test_characters_page_in_sitemap(tmp_path, vault_path):
     assert "https://example.com/myrepo/tools/cron.html" in sitemap
     assert "https://example.com/myrepo/tools/chmod.html" in sitemap
     assert "https://example.com/myrepo/tools/cidr.html" in sitemap
+    assert "https://example.com/myrepo/tools/timestamp.html" in sitemap
 
 
 def test_subnet_page_emitted(config):
@@ -120,10 +121,13 @@ def test_topbar_has_tools_dropdown(config):
     assert ">chmod Calculator</a>" in html
     assert 'href="/myrepo/tools/cidr.html"' in html
     assert ">CIDR Aggregator</a>" in html
+    assert 'href="/myrepo/tools/timestamp.html"' in html
+    assert ">Timestamp Converter</a>" in html
     # Entries are alphabetical (case-insensitive) and each carries an icon.
     names = [
         "Certificate Checker", "Character Inspector", "chmod Calculator",
         "CIDR Aggregator", "Cron Parser", "Subnet Calculator",
+        "Timestamp Converter",
     ]
     positions = [html.index(">" + n + "</a>") for n in names]
     assert positions == sorted(positions)
@@ -187,7 +191,7 @@ def test_certs_wikilink_resolves(tmp_path):
 
 def test_tool_example_buttons(config):
     build_site(config)
-    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr"):
+    for page in ("characters", "subnet", "certs", "cron", "chmod", "cidr", "timestamp"):
         html = (config.out / "tools" / (page + ".html")).read_text(encoding="utf-8")
         assert html.count('class="tool-examples"') == 1, page
         assert html.count('class="example-btn"') == 3, page
@@ -281,3 +285,32 @@ def test_cidr_wikilink_resolves(tmp_path):
     assert 'href="/tools/cidr.html"' in html
     assert '<span class="broken-link"' not in html
     assert not any("CIDR" in w for w in warnings)
+
+
+def test_timestamp_page_emitted(config):
+    build_site(config)
+    html = (config.out / "tools" / "timestamp.html").read_text(encoding="utf-8")
+    assert 'id="ts-input"' in html
+    assert 'id="ts-now"' in html
+    assert 'id="ts-desc"' in html
+    assert 'id="ts-table"' in html
+    assert 'id="ts-wiki"' in html
+    assert "/myrepo/assets/tools/timestamp.js" in html
+    assert html.count('class="wiki-entry"') == 9
+
+
+def test_timestamp_wikilink_resolves(tmp_path):
+    vault = tmp_path / "vault"
+    vault.mkdir()
+    (vault / "home.md").write_text(
+        "---\ntitle: Home\npublish: true\n---\n\n"
+        "Use the [[Timestamp Converter]].\n",
+        encoding="utf-8",
+    )
+    config = SiteConfig(vault=vault, out=tmp_path / "out", base_url="/")
+    warnings = build_site(config)
+
+    html = (config.out / "home.html").read_text(encoding="utf-8")
+    assert 'href="/tools/timestamp.html"' in html
+    assert '<span class="broken-link"' not in html
+    assert not any("Timestamp" in w for w in warnings)

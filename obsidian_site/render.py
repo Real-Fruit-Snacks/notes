@@ -156,6 +156,9 @@ class Renderer:
         cidr_tpl = self.env.get_template("tools/cidr.html")
         pages["tools/cidr.html"] = cidr_tpl.render(nav=nav)
 
+        ts_tpl = self.env.get_template("tools/timestamp.html")
+        pages["tools/timestamp.html"] = ts_tpl.render(nav=nav)
+
         pages["404.html"] = self.env.get_template("404.html").render(nav=nav)
 
         pages["site.webmanifest"] = json.dumps({
@@ -216,6 +219,7 @@ class Renderer:
             self.config.abs_url("tools/cron.html"),
             self.config.abs_url("tools/chmod.html"),
             self.config.abs_url("tools/cidr.html"),
+            self.config.abs_url("tools/timestamp.html"),
         ]
         urls += [self.config.abs_url(f"tags/{slugify(t)}.html") for t in tags]
         urls = [u for u in urls if u]  # only when site_url is configured

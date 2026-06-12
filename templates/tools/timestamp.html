@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% set canonical_path = "tools/timestamp.html" %}
+{% block title %}Timestamp Converter · {{ site_title }}{% endblock %}
+{% block content %}
+<article class="note tool-page">
+  <h1 class="note-title">Timestamp Converter</h1>
+  <p class="muted">Paste any timestamp — Unix epoch (seconds, milliseconds,
+  even µs/ns), ISO&nbsp;8601, RFC&nbsp;2822 — and read it back in every
+  format at once. Click any value to copy it.</p>
+  <noscript><p class="muted">This tool requires JavaScript.</p></noscript>
+  <div class="ts-input-row">
+    <input type="text" id="ts-input" class="subnet-input" value=""
+      autocomplete="off" autocapitalize="off" spellcheck="false"
+      aria-label="Timestamp to convert">
+    <button type="button" id="ts-now" class="copy-list-btn">Now</button>
+  </div>
+  <div class="tool-examples">
+    <span class="examples-label muted">Try an example:</span>
+    <button type="button" class="example-btn" data-example="epoch">0 (the epoch)</button>
+    <button type="button" class="example-btn" data-example="y2038">2147483647 (Y2038)</button>
+    <button type="button" class="example-btn" data-example="tokyo">Christmas in Tokyo</button>
+  </div>
+  <p id="ts-error" class="subnet-error" hidden aria-live="polite"></p>
+  <div id="ts-output">
+    <p id="ts-desc" class="ts-desc" aria-live="polite" hidden></p>
+    <dl id="ts-table" class="subnet-facts ts-facts" aria-live="polite" aria-atomic="true"></dl>
+  </div>
+  <section class="tool-wiki" id="ts-wiki">
+    <h2>Understanding timestamps</h2>
+    <details class="wiki-entry">
+      <summary>What's an epoch?</summary>
+      <p>Unix time counts seconds since <strong>1970-01-01 00:00:00 UTC</strong>
+      — "the epoch", an arbitrary zero chosen by early Unix developers. It's
+      timezone-free by definition: 1,781,234,567 means the same instant in
+      Tokyo and Toronto; only the <em>rendering</em> into a wall-clock date
+      needs a zone. Negative values reach before 1970.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Seconds vs milliseconds (vs µs and ns)</summary>
+      <p>Unix tools speak seconds (10 digits today), JavaScript's
+      <code>Date.now()</code> speaks milliseconds (13), and logging systems
+      often emit micro- or nanoseconds (16, 19). Mixing them up is the classic
+      bug: a seconds value read as milliseconds lands in <em>January 1970</em>;
+      milliseconds read as seconds lands fifty-thousand years out. This page
+      guesses by magnitude and always tells you which unit it assumed.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>ISO 8601</summary>
+      <p><code>2026-06-12T15:30:00Z</code>: biggest unit first, which makes
+      string-sorting equal date-sorting. The <code>T</code> separates date and
+      time; the suffix names the zone — <code>Z</code> is UTC ("Zulu"),
+      <code>+05:30</code> an offset. <strong>No suffix means ambiguous</strong>:
+      this page assumes your local clock and says so. A bare date like
+      <code>2026-06-12</code> is treated as midnight UTC, matching the
+      standard's (and JavaScript's) reading.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>RFC 2822</summary>
+      <p><code>Thu, 12 Jun 2026 15:30:00 -0400</code> — the email date format,
+      inherited by HTTP headers and RSS. Human-friendly day names, but
+      English-only and unsortable as text; it survives because billions of
+      <code>Date:</code> headers already speak it.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>UTC vs your clock</summary>
+      <p>UTC is the reference everyone offsets from. The robust pattern is:
+      <strong>store and exchange UTC (or epoch), convert to local only at the
+      edges</strong> — screens and parsers. The moment two systems exchange
+      wall-clock strings without zones, someone's meeting moves three
+      hours.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Time zones are politics</summary>
+      <p>Offsets are law, not physics — countries change them with months of
+      notice, which is why software uses IANA names like
+      <code>America/New_York</code> (a database of history and future rules)
+      rather than raw offsets. Three-letter abbreviations are traps:
+      <code>CST</code> alone means Central, China, or Cuba Standard Time.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>DST traps</summary>
+      <p>Twice a year wall clocks lie: in spring an hour <em>doesn't
+      exist</em> (02:30 on the spring-forward night never happens), in fall an
+      hour <em>happens twice</em> (01:30 is ambiguous). Cron jobs in the gap
+      get skipped or doubled, "add 24 hours" stops meaning "same time
+      tomorrow", and any code that parses a local time without a zone rolls
+      the dice twice a year. Schedule in UTC or pin an IANA zone.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>The Y2038 problem</summary>
+      <p>Signed 32-bit Unix time overflows at <strong>2147483647</strong> =
+      2038-01-19 03:14:07 UTC (try the example button) and wraps to December
+      1901. Modern systems moved to 64 bits, but embedded devices, old file
+      formats, and packed binary protocols still carry 32-bit timestamps —
+      the fix is deployment, not design.</p>
+    </details>
+    <details class="wiki-entry">
+      <summary>Leap seconds &amp; smearing</summary>
+      <p>Earth's rotation drifts, so UTC occasionally inserts a leap second —
+      and Unix time <em>pretends it didn't happen</em>: 23:59:60 simply
+      doesn't exist in epoch arithmetic, so an epoch day is always exactly
+      86,400 s. Big fleets "smear" the extra second across hours instead of
+      stepping. Two careful systems can legitimately disagree by a second —
+      if that matters to you, you already know it.</p>
+    </details>
+  </section>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ base_url }}assets/tools/timestamp.js"></script>
+{% endblock %}

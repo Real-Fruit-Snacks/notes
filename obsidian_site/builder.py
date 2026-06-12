@@ -21,6 +21,7 @@ RESERVED_PAGES = {
     "cron parser": "tools/cron",
     "chmod calculator": "tools/chmod",
     "cidr aggregator": "tools/cidr",
+    "timestamp converter": "tools/timestamp",
 }
 
 
